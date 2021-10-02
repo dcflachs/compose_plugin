@@ -19,7 +19,7 @@ cd $tmpdir
 
 chmod -R +x $tmpdir/usr/local/lib/docker/cli-plugins/
 
-makepkg -l y -c y $OUTPUT_FOLDER/docker-compose-package-${version}.txz
+makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 
 cd /
 
@@ -27,4 +27,4 @@ rm -rf $tmpdir
 
 echo "MD5:"
 
-md5sum $OUTPUT_FOLDER/docker-compose-package-${version}.txz
+md5sum $OUTPUT_FOLDER/compose.manager-package-${version}.txz
