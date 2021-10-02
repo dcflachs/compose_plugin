@@ -1,0 +1,36 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+<!ENTITY name        "docker.compose">
+<!ENTITY author      "dcflachs">
+<!ENTITY version     "2021.10.01">
+<!-- <!ENTITY launch      "Settings/&name;"> -->
+<!ENTITY packageVER  "&version;">
+<!ENTITY packageMD5  "">
+<!ENTITY packageName "&name;-package-&packageVER;">
+<!ENTITY packagefile "&packageName;.txz">
+<!ENTITY github     	"dcflachs/compose_plugin">
+<!ENTITY pluginURL   "https://raw.githubusercontent.com/&github;/master/&name;.plg">
+<!ENTITY packageURL  "https://github.com/&github;/releases/download/&version;/&packagefile;">
+<!ENTITY pluginLOC   "/boot/config/plugins/&name;">
+<!ENTITY emhttpLOC   "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         launch="&launch;"
+         pluginURL="&pluginURL;"
+         icon="cubes"
+         min="6.9.0"
+>
+
+<FILE Name="/usr/local/lib/docker/cli-plugins/docker-compose-linux-x86_64" Run="chmod +x">
+<URL>https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64</URL>
+<SHA256>https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64.sha256</SHA256>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+kill -SIGHUP pidof docker
+</INLINE>
+</FILE>
