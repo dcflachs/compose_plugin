@@ -10,8 +10,8 @@ version=$(date +"%Y.%m.%d")$1
 
 mkdir -p $tmpdir/usr/local/lib/docker/cli-plugins/
 cd $tmpdir/usr/local/lib/docker/cli-plugins/
-curl -L -O  https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64
-curl -L -O  https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64.sha256
+wget https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64
+wget https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64.sha256
 sha256sum -c SHA256SUMS 2>&1 | grep -q OK || exit 2
 rm docker-compose-linux-x86_64.sha256
 
