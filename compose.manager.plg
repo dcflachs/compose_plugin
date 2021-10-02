@@ -1,0 +1,74 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+<!ENTITY name        "compose.manager">
+<!ENTITY author      "dcflachs">
+<!ENTITY version     "2021.10.01">
+<!-- <!ENTITY launch      "Settings/&name;"> -->
+<!ENTITY packageVER  "&version;">
+<!ENTITY packageMD5  "">
+<!ENTITY packageName "&name;-package-&packageVER;">
+<!ENTITY packagefile "&packageName;.txz">
+<!ENTITY github      "dcflachs/compose_plugin">
+<!ENTITY pluginURL   "https://raw.githubusercontent.com/&github;/master/&name;.plg">
+<!ENTITY packageURL  "https://github.com/&github;/releases/download/&version;/&packagefile;">
+<!ENTITY pluginLOC   "/boot/config/plugins/&name;">
+<!ENTITY emhttpLOC   "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         launch="&launch;"
+         pluginURL="&pluginURL;"
+         icon="cubes"
+         min="6.9.0"
+>
+
+<CHANGES>
+</CHANGES>
+
+<!-- The 'pre-install' script. -->
+<FILE Run="/bin/bash">
+<INLINE>
+# Remove old 'source' files
+rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
+</INLINE>
+</FILE>
+
+<FILE Name="&pluginLOC;/&packagefile;" Run="upgradepkg --install-new">
+<URL>&packageURL;</URL>
+<MD5>&packageMD5;</MD5>
+</FILE> 
+
+<FILE Run="/bin/bash">
+<INLINE>
+kill -SIGHUP pidof docker
+</INLINE>
+</FILE>
+
+<!--
+The 'post-install' script
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+echo ""
+echo "----------------------------------------------------"
+echo " &name; has been installed."
+echo " Version: &version;"
+echo "----------------------------------------------------"
+echo ""
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+removepkg &packageName;
+
+# Remove plugin related files
+rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
+
+</INLINE>
+</FILE> 
