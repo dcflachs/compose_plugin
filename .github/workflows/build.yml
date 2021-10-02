@@ -1,0 +1,82 @@
+name: Compose Plugin CI
+
+on:
+  push:
+    tags: [ '20[0-9]+.[0-9]+.[0-9]' ]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a Release T/F'
+      version_letter:
+        description: 'Additional Letter to add to the version'
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y.%m.%d')" 
+      
+    - name: Set Pre-Build ENV Variables
+      if: github.event.inputs.version_letter
+      run: |
+          echo "UI_VERSION_LETTER=${{github.event.inputs.version_letter}}" >> $GITHUB_ENV
+      
+    - name: Build the in Docker
+      run: |
+        chmod +x ./build_in_docker.sh
+        chmod +x ./source/pkg_build.sh
+        ./build_in_docker.sh -u
+   
+    - name: Set Post-Build ENV Variables
+      id: version
+      run: echo "::set-output name=version::${{steps.date.outputs.date}}${{env.UI_VERSION_LETTER}}" 
+   
+    - name: Upload Artifact 
+      uses: actions/upload-artifact@v2
+      with:
+        name: compose.manager-package-${{steps.version.outputs.version}}.txz
+        path: ./archive/compose.manager-package-*
+
+    - name: Set Release ENV Variables On Manual
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+          echo "DO_RELEASE=${{github.event.inputs.create_release}}" >> $GITHUB_ENV
+          echo "RELEASE_TAG_NAME=${{steps.version.outputs.version}}" >> $GITHUB_ENV
+          
+    - name: Set Release ENV Variables On Auto
+      if: github.event_name != 'workflow_dispatch'
+      run: |
+          echo "DO_RELEASE=T" >> $GITHUB_ENV
+          echo "RELEASE_TAG_NAME=${{github.GITHUB_REF}}" >> $GITHUB_ENV
+          
+    - name: Create Manual Release
+      id: create_release
+      uses: actions/create-release@v1
+      if: env.DO_RELEASE == 'T'
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name:  ${{env.RELEASE_TAG_NAME}}
+        release_name: Compose Manager Package ${{env.RELEASE_TAG_NAME}}
+        draft: true
+        prerelease: false
+    
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      if: env.DO_RELEASE == 'T'
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./archive/compose.manager-package-${{steps.version.outputs.version}}.txz
+          asset_name: compose.manager-package-${{steps.version.outputs.version}}.txz
+          asset_content_type: application/octet-stream
