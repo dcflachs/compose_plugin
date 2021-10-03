@@ -43,7 +43,7 @@ rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
 
 <FILE Run="/bin/bash">
 <INLINE>
-kill -SIGHUP pidof docker
+pidof dockerd | xargs kill -SIGHUP
 </INLINE>
 </FILE>
 
