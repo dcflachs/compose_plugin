@@ -5,7 +5,7 @@
 tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 version=$(date +"%Y.%m.%d")$1
 
-mkdir -P $tmpdir
+mkdir -p $tmpdir
 
 # mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager
 
