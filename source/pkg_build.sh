@@ -1,7 +1,7 @@
 #!/bin/bash
 [ -z "$OUTPUT_FOLDER" ] && echo "Output Folder not set" && exit 1
-[ -z "$COMPOSE_VERSION" ] && echo "Compose Version not set" && exit 1
-[ -z "$COMPOSE_SWITCH_VERSION" ] && echo "Compose Switch Version not set" && exit 1
+[ -z "$COMPOSE_VERSION" ] && echo "Compose Version not set" && exit 2
+[ -z "$COMPOSE_SWITCH_VERSION" ] && echo "Compose Switch Version not set" && exit 3
 tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 version=$(date +"%Y.%m.%d")$1
 
@@ -14,7 +14,7 @@ cd $tmpdir
 #Install the docker compose cli plugin
 wget --no-check-certificate https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64
 wget --no-check-certificate https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64.sha256
-sha256sum -c docker-compose-linux-x86_64.sha256 2>&1 | grep -q OK || exit 2
+sha256sum -c docker-compose-linux-x86_64.sha256 2>&1 | grep -q OK || exit 4
 rm docker-compose-linux-x86_64.sha256
 
 mkdir -p $tmpdir/usr/local/lib/docker/cli-plugins/
