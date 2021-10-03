@@ -18,8 +18,7 @@ sha256sum -c docker-compose-linux-x86_64.sha256 2>&1 | grep -q OK || exit 4
 rm docker-compose-linux-x86_64.sha256
 
 mkdir -p $tmpdir/usr/local/lib/docker/cli-plugins/
-cd $tmpdir/usr/local/lib/docker/cli-plugins/
-cp docker-compose-linux-x86_64 docker-compose
+cp docker-compose-linux-x86_64 $tmpdir/usr/local/lib/docker/cli-plugins/docker-compose
 chmod -R +x $tmpdir/usr/local/lib/docker/cli-plugins/
 
 rm docker-compose-linux-x86_64
