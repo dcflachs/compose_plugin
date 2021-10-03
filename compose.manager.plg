@@ -5,7 +5,7 @@
 <!ENTITY version     "2021.10.03">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "113d4b26881d0901eb7d2082091ba317">
+<!ENTITY packageMD5  "ca7681913c0579a592294dae970ac766">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,7 +25,10 @@
 >
 
 <CHANGES>
-Testing
+###2021.10.03
+- Initial Release 
+- Docker Compose v2.0.1 
+- Compose Switch v1.0.2
 </CHANGES>
 
 <!-- The 'pre-install' script. -->
@@ -40,12 +43,6 @@ rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
 <URL>&packageURL;</URL>
 <MD5>&packageMD5;</MD5>
 </FILE> 
-
-<FILE Run="/bin/bash">
-<INLINE>
-pidof dockerd | xargs kill -SIGHUP
-</INLINE>
-</FILE>
 
 <FILE Run="/bin/bash">
 <INLINE>
@@ -64,7 +61,6 @@ removepkg &packageName;
 
 # Remove plugin related files
 rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
-
 </INLINE>
 </FILE> 
 
