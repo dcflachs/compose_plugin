@@ -25,6 +25,7 @@
 >
 
 <CHANGES>
+Testing
 </CHANGES>
 
 <!-- The 'pre-install' script. -->
@@ -46,9 +47,6 @@ kill -SIGHUP pidof docker
 </INLINE>
 </FILE>
 
-<!--
-The 'post-install' script
--->
 <FILE Run="/bin/bash">
 <INLINE>
 echo ""
@@ -60,9 +58,6 @@ echo ""
 </INLINE>
 </FILE>
 
-<!--
-The 'remove' script.
--->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 removepkg &packageName;
@@ -72,3 +67,5 @@ rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
 
 </INLINE>
 </FILE> 
+
+</PLUGIN>
