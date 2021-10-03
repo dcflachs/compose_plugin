@@ -12,7 +12,7 @@ mkdir -p $tmpdir/usr/local/lib/docker/cli-plugins/
 cd $tmpdir/usr/local/lib/docker/cli-plugins/
 wget --no-check-certificate https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64
 wget --no-check-certificate https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64.sha256
-sha256sum -c SHA256SUMS 2>&1 | grep -q OK || exit 2
+sha256sum -c docker-compose-linux-x86_64.sha256 2>&1 | grep -q OK || exit 2
 rm docker-compose-linux-x86_64.sha256
 
 cd $tmpdir
