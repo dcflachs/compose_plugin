@@ -9,7 +9,7 @@
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
-<!ENTITY pluginURL   "https://raw.githubusercontent.com/&github;/master/&name;.plg">
+<!ENTITY pluginURL   "https://raw.githubusercontent.com/&github;/main/&name;.plg">
 <!ENTITY packageURL  "https://github.com/&github;/releases/download/&version;/&packagefile;">
 <!ENTITY pluginLOC   "/boot/config/plugins/&name;">
 <!ENTITY emhttpLOC   "/usr/local/emhttp/plugins/&name;">
