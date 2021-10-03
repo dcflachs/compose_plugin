@@ -26,8 +26,9 @@ rm docker-compose-linux-x86_64
 
 #Install compose switch
 wget --no-check-certificate  https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 
-cp docker-compose-linux-amd64 /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+mkdir -p $tmpdir/usr/local/bin
+cp docker-compose-linux-amd64 $tmpdir/usr/local/bin/docker-compose
+chmod +x $tmpdir/usr/local/bin/docker-compose
 rm docker-compose-linux-amd64
 
 makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
