@@ -3,7 +3,7 @@
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
 <!ENTITY version     "2021.10.03">
-<!-- <!ENTITY launch      "Settings/&name;"> -->
+<!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
 <!ENTITY packageMD5  "113d4b26881d0901eb7d2082091ba317">
 <!ENTITY packageName "&name;-package-&packageVER;">
