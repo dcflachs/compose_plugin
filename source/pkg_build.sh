@@ -20,7 +20,6 @@ rm docker-compose-linux-x86_64.sha256
 mkdir -p $tmpdir/usr/local/lib/docker/cli-plugins/
 cp docker-compose-linux-x86_64 $tmpdir/usr/local/lib/docker/cli-plugins/docker-compose
 chmod -R +x $tmpdir/usr/local/lib/docker/cli-plugins/
-
 rm docker-compose-linux-x86_64
 
 #Install compose switch
@@ -33,8 +32,6 @@ rm docker-compose-linux-amd64
 makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 
 cd /
-
-rm -rf $tmpdir
 
 echo "MD5:"
 
