@@ -7,11 +7,13 @@ version=$(date +"%Y.%m.%d")$1
 
 mkdir -p $tmpdir
 
-# mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager
-
-# cp -RT /mnt/source/docker.compose/ $tmpdir/usr/local/emhttp/plugins/compose.manager/
+mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager
+cp -RT /mnt/source/compose.manager/ $tmpdir/usr/local/emhttp/plugins/compose.manager/
 
 cd $tmpdir
+
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/scripts/
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/php/
 
 #Install the docker compose cli plugin
 wget --no-check-certificate https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64
