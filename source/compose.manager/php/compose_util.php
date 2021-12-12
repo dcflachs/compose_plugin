@@ -2,6 +2,12 @@
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 
+function sanitizeStr($a) {
+	$a = str_replace(".","_",$a);
+	$a = str_replace(" ","_",$a);
+	return str_replace("-","_",$a);
+}
+
 switch ($_POST['action']) {
 	case 'composeUp':
 		$path = isset($_POST['path']) ? urldecode(($_POST['path'])) : "";
@@ -11,9 +17,14 @@ switch ($_POST['action']) {
 			logger("Array not Started!");
 			break;
 		}
+		$projectName = basename($path);
+		if ( is_file("$path/name") ) {
+			$projectName = trim(file_get_contents("$path/name"));
+		}
+		$projectName = sanitizeStr($projectName);
 		$path .= "/compose.yml";
 		// exec("chmod +x ".escapeshellarg($plugin_root."/scripts/compose.sh"));
-		$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=".$path."&arg2=up";
+		$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=up"."&arg2=".$path."&arg3=".$projectName;
 		echo $composeCommand;
 		break;
 	case 'composeDown':
@@ -24,9 +35,14 @@ switch ($_POST['action']) {
 			logger("Array not Started!");
 			break;
 		}
+		$projectName = basename($path);
+		if ( is_file("$path/name") ) {
+			$projectName = trim(file_get_contents("$path/name"));
+		}
+		$projectName = sanitizeStr($projectName);
 		$path .= "/compose.yml";
 		// exec("chmod +x ".escapeshellarg($plugin_root."/scripts/compose.sh"));
-		$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=".$path."&arg2=down";
+		$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=down"."&arg2=".$path."&arg3=".$projectName;
 		echo $composeCommand;
 		break;
 }

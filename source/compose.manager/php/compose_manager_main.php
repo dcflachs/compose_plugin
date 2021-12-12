@@ -63,7 +63,7 @@ $(function() {
 			var myID = origin.attr('id');
 			var name = $("#"+myID).html();
 			var stackName = $("#"+myID).attr("data-scriptname");
-			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);'><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack'></center>");
+			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);'><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack'></center>");
 		}
 	});
 });
@@ -170,7 +170,24 @@ function editStack(myID) {
   var script = $("#"+myID).attr("data-scriptname");
   $.post(caURL,{action:'getYml',script:script},function(data) {
     if (data) {
-      $("#editScriptName").html(script);
+      $("#editStackName").html(script);
+      $('#editStackFileName').html('compose.yml')
+      $("#editStack").html(data);
+      $("#editStack").val(data);
+      $(".editing").show();
+			window.scrollTo(0, 0);
+    }
+  });
+}
+
+function editEnv(myID) {
+  var origID = myID;
+  $("#"+myID).tooltipster("close");
+  var script = $("#"+myID).attr("data-scriptname");
+  $.post(caURL,{action:'getEnv',script:script},function(data) {
+    if (data) {
+      $("#editStackName").html(script);
+      $('#editStackFileName').html('.env')
       $("#editStack").html(data);
       $("#editStack").val(data);
       $(".editing").show();
@@ -184,10 +201,26 @@ function cancelEdit() {
 }
 
 function saveEdit() {
-  var script = $("#editScriptName").html();
+  var script = $("#editStackName").html();
+  var fileName = $("#editStackFileName").html();
   var scriptContents = $("#editStack").val();
+  var actionStr = null
   
-  $.post(caURL,{action:'saveYml',script:script,scriptContents:scriptContents},function(data) {
+  switch(fileName) {
+    case 'compose.yml':
+      actionStr = 'saveYml'
+      break;
+
+    case '.env':
+      actionStr = 'saveEnv'
+      break;
+    
+    default:
+      $(".editing").hide();
+      return;
+  }
+
+  $.post(caURL,{action:actionStr,script:script,scriptContents:scriptContents},function(data) {
     if (data) {
       $(".editing").hide();
     }
@@ -218,7 +251,7 @@ function ComposeDown(path) {
 <BODY>
 
 <div class='editing' hidden>
-<center><b>Editing <?=$compose_root?>/<span id='editScriptName'></span>/compose.yml</b><br>
+<center><b>Editing <?=$compose_root?>/<span id='editStackName'></span>/<span id='editStackFileName'></span></b><br>
 <input type='button' value='Cancel' onclick='cancelEdit();'><input type='button' onclick='saveEdit();' value='Save Changes'><br>
 <textarea class='editing' id='editStack' style='width:90%; height:500px; border-color:red; font-family:monospace;'></textarea>
 </center>

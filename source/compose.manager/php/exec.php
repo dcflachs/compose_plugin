@@ -67,6 +67,22 @@ switch ($_POST['action']) {
         file_put_contents("$compose_root/$script/compose.yml",$scriptContents);
         echo "$compose_root/$script/compose.yml saved";
         break;
+    case 'getEnv':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $scriptContents = is_file("$compose_root/$script/.env") ? file_get_contents("$compose_root/$script/.env") : "";
+        $scriptContents = str_replace("\r","",$scriptContents);
+        echo $scriptContents;
+        if ( ! $scriptContents ) {
+            echo "\n";
+        }
+        break;
+    case 'saveEnv':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
+    //		$scriptContents = preg_replace('/[\x80-\xFF]/', '', $scriptContents);
+        file_put_contents("$compose_root/$script/.env",$scriptContents);
+        echo "$compose_root/$script/.env saved";
+        break;
 }
 
 ?>
