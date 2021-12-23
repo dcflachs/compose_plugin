@@ -1,4 +1,4 @@
-<?PHP 
+<?PHP
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 
@@ -30,8 +30,9 @@ foreach ($composeProjects as $script) {
   }
   $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($script)." id='desc$id'>$description</span>";
   $o .= "</td>";
-  $o .= "<td width=10%><input type='button' value='Compose Up' class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=10%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
   $o .= "<td width=10%><input type='button' value='Compose Down' class='up$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=10%><input type='button' value='Compose Pull' class='up$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
 }
 ?>
 
@@ -195,7 +196,7 @@ function editEnv(myID) {
     }
   });
 }
-  
+
 function cancelEdit() {
   $(".editing").hide();
 }
@@ -205,7 +206,7 @@ function saveEdit() {
   var fileName = $("#editStackFileName").html();
   var scriptContents = $("#editStack").val();
   var actionStr = null
-  
+
   switch(fileName) {
     case 'compose.yml':
       actionStr = 'saveYml'
@@ -214,7 +215,7 @@ function saveEdit() {
     case '.env':
       actionStr = 'saveEnv'
       break;
-    
+
     default:
       $(".editing").hide();
       return;
@@ -225,7 +226,7 @@ function saveEdit() {
       $(".editing").hide();
     }
   });
-  
+
 }
 
 function ComposeUp(path) {
@@ -243,6 +244,14 @@ function ComposeDown(path) {
     }
   })
 }
+
+function ComposePull(path) {
+  $.post(compURL,{action:'composePull',path:path},function(data) {
+    if (data) {
+      openBox(data,"Stack "+basename(path)+" Pull",800,1200);
+    }
+  })
+}
 </script>
 
 
@@ -257,7 +266,7 @@ function ComposeDown(path) {
 </center>
 </div>
 
-<span class='tipsterallowed' hidden></span><br> 
+<span class='tipsterallowed' hidden></span><br>
 <table>
 <?=$o?>
 </table>
