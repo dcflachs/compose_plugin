@@ -30,9 +30,10 @@ foreach ($composeProjects as $script) {
   }
   $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($script)." id='desc$id'>$description</span>";
   $o .= "</td>";
-  $o .= "<td width=10%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=10%><input type='button' value='Compose Down' class='up$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=10%><input type='button' value='Compose Pull' class='up$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=30%></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Down' class='up$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Pull' class='up$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
 }
 ?>
 
