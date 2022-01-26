@@ -1,6 +1,7 @@
 <?php
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
+require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 
 function logger($string) {
 	$string = escapeshellarg($string);
@@ -26,29 +27,10 @@ function execComposeCommandInTTY($cmd)
 }
 
 function echoComposeCommand($action)
-// {
-// 	global $plugin_root;
-// 	$path = isset($_POST['path']) ? urldecode(($_POST['path'])) : "";
-// 	$unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
-// 	if ($unRaidVars['mdState'] != "STARTED" ) {
-// 		echo $plugin_root."/scripts/arrayNotStarted.sh";
-// 		logger("Array not Started!");
-// 	}
-// 	else
-// 	{
-// 		$projectName = basename($path);
-// 		if ( is_file("$path/name") ) {
-// 			$projectName = trim(file_get_contents("$path/name"));
-// 		}
-// 		$projectName = sanitizeStr($projectName);
-// 		$path .= "/compose.yml";
-// 		// exec("chmod +x ".escapeshellarg($plugin_root."/scripts/compose.sh"));
-// 		$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=".$action."&arg2=".$path."&arg3=".$projectName;
-// 		echo $composeCommand;
-// 	}
-// }
 {
 	global $plugin_root;
+	global $sName;
+	$cfg = parse_plugin_cfg($sName);
 	$path = isset($_POST['path']) ? urldecode(($_POST['path'])) : "";
 	$unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
 	if ($unRaidVars['mdState'] != "STARTED" ) {
@@ -63,12 +45,19 @@ function echoComposeCommand($action)
 		}
 		$projectName = sanitizeStr($projectName);
 		$path .= "/compose.yml";
-		$compose_command = join(" ", array(escapeshellarg($plugin_root."scripts/compose.sh"),escapeshellarg($action),escapeshellarg($path),escapeshellarg($projectName)));
-		logger($compose_command);
+
+		if ($cfg['OUTPUTSTYLE'] == "ttyd") {
+			$composeCommand = join(" ", array(escapeshellarg($plugin_root."scripts/compose.sh"),escapeshellarg($action),escapeshellarg($path),escapeshellarg($projectName)));
+			execComposeCommandInTTY($composeCommand);
+			logger($composeCommand);
+			$composeCommand = "/plugins/compose.manager/php/show_ttyd.php";
+		}
+		else {
+			$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=".$action."&arg2=".$path."&arg3=".$projectName;
+		}
 		
-		execComposeCommandInTTY($compose_command);
-		echo "/plugins/compose.manager/php/show_ttyd.php";
-		logger("/plugins/compose.manager/php/show_ttyd.php");
+		echo $composeCommand;
+		logger($composeCommand);
 	}	
 }
 

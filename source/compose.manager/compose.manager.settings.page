@@ -1,0 +1,23 @@
+Icon="cubes"
+Author="dcflachs"
+Title="Compose"
+Type="xmenu"
+Menu="Utilities"
+---
+<?php 
+require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
+$cfg = parse_plugin_cfg($sName);
+?>
+
+<form markdown="1" name="compose_manager_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="<?=$sName?>/<?=$sName?>.cfg">
+
+_(Compose Command Progress Display)_:
+: <select name="OUTPUTSTYLE">
+  <?=mk_option($cfg['OUTPUTSTYLE'], "basic", _("Basic"))?>
+  <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Experimental"))?>
+  </select>
+
+<input type="submit" name="#default" value="_(Default)_">
+: <input type="submit" name="#apply" value="_(Apply)_" disabled><input type="button" value="_(Done)_" onclick="done()">
+</form>
