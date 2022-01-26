@@ -231,25 +231,34 @@ function saveEdit() {
 }
 
 function ComposeUp(path) {
+  var height = 800;
+  var width = 1200;
+  
   $.post(compURL,{action:'composeUp',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Up",800,1200);
+      openBox(data,"Stack "+basename(path)+" Up",height,width);
     }
   })
 }
 
 function ComposeDown(path) {
+  var height = 800;
+  var width = 1200;
+
   $.post(compURL,{action:'composeDown',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Down",800,1200);
+      openBox(data,"Stack "+basename(path)+" Down",height,width);
     }
   })
 }
 
 function ComposePull(path) {
+  var height = 800;
+  var width = 1200;
+
   $.post(compURL,{action:'composePull',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Pull",800,1200);
+      openBox(data,"Stack "+basename(path)+" Pull",height,width);
     }
   })
 }
