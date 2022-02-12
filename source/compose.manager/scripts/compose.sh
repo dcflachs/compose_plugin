@@ -14,6 +14,10 @@ case $1 in
     docker compose -f "$2" -p "$3" pull  2>&1
     ;;
 
+  stop)
+    docker compose -f "$2" -p "$3" stop  2>&1
+    ;;
+
   *)
     echo -n "unknown command"
     ;;

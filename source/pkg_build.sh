@@ -12,6 +12,7 @@ cp -RT /mnt/source/compose.manager/ $tmpdir/usr/local/emhttp/plugins/compose.man
 
 cd $tmpdir
 
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/event/
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/scripts/
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/php/
 

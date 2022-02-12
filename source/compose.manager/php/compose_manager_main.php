@@ -28,12 +28,22 @@ foreach ($composeProjects as $script) {
   } else {
     $description = $variables['description'] ? $variables['description'] : "No description<br>($compose_root/$script)";
   }
+
+  $autostart = '';
+  if ( is_file("$compose_root/$script/autostart") ) {
+    $autostarttext = @file_get_contents("$compose_root/$script/autostart");
+    if ( strpos($autostarttext, 'true') !== false ) {
+      $autostart = 'checked';
+    }
+  }
+
   $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($script)." id='desc$id'>$description</span>";
   $o .= "</td>";
-  $o .= "<td width=30%></td>";
+  $o .= "<td width=25%></td>";
   $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Down' class='up$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Pull' class='up$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Down' class='down$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Pull' class='pull$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($script)." id='$id' style='display:none' $autostart></td>";
 }
 ?>
 
@@ -68,6 +78,12 @@ $(function() {
 			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);'><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack'></center>");
 		}
 	});
+  $('.auto_start').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
+  $('.auto_start').change(function(){
+      var script = $(this).attr("data-scriptname");
+      var auto = $(this).prop('checked');
+      $.post(caURL,{action:'updateAutostart',script:script,autostart:auto});
+    });
 });
 
 function addStack() {
@@ -278,6 +294,7 @@ function ComposePull(path) {
 
 <span class='tipsterallowed' hidden></span><br>
 <table>
+<thead><tr><th style="text-align:left">Stack</th><th></th><th style="text-align:left" colspan="3">Commands</th><th style="text-align:left">Auto Start</th></tr></thead>
 <?=$o?>
 </table>
 <br>

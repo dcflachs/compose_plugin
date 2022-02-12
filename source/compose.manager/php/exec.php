@@ -11,12 +11,12 @@ function getElement($element) {
 switch ($_POST['action']) {
     case 'addStack':
         $stackName = isset($_POST['stackName']) ? urldecode(($_POST['stackName'])) : "";
-            $folderName = str_replace('"',"",$stackName);
-            $folderName = str_replace("'","",$folderName);
-            $folderName = str_replace("&","",$folderName);
-            $folderName = str_replace("(","",$folderName);
-            $folderName = str_replace(")","",$folderName);
-            $folderName = preg_replace("/ {2,}/", " ", $folderName);
+        $folderName = str_replace('"',"",$stackName);
+        $folderName = str_replace("'","",$folderName);
+        $folderName = str_replace("&","",$folderName);
+        $folderName = str_replace("(","",$folderName);
+        $folderName = str_replace(")","",$folderName);
+        $folderName = preg_replace("/ {2,}/", " ", $folderName);
         $folder = "$compose_root/$folderName";
         while ( true ) {
           if ( is_dir($folder) ) {
@@ -44,7 +44,7 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $newName = isset($_POST['newName']) ? urldecode(($_POST['newName'])) : "";
         file_put_contents("$compose_root/$script/name",trim($newName));
-            echo "ok";
+        echo "ok";
         break;
     case 'changeDesc':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
@@ -82,6 +82,19 @@ switch ($_POST['action']) {
     //		$scriptContents = preg_replace('/[\x80-\xFF]/', '', $scriptContents);
         file_put_contents("$compose_root/$script/.env",$scriptContents);
         echo "$compose_root/$script/.env saved";
+        break;
+    case 'updateAutostart':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        if ( ! $script ) {
+            echo "huh?";
+            break;
+        }
+        $autostart = isset($_POST['autostart']) ? urldecode(($_POST['autostart'])) : "false";
+        $fileName = "$compose_root/$script/autostart";
+        if ( is_file($fileName) ) {
+            exec("rm ".escapeshellarg($fileName));
+        }
+        file_put_contents($fileName,$autostart);
         break;
 }
 
