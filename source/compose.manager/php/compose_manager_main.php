@@ -4,6 +4,9 @@ require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 
+$stackstate = shell_exec($plugin_root."/scripts/compose.sh list");
+$stackstate = json_decode($stackstate, TRUE);
+
 $composeProjects = @array_diff(@scandir($compose_root),array(".",".."));
 if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
@@ -19,8 +22,29 @@ foreach ($composeProjects as $script) {
   }
   $id = str_replace(".","-",$script);
   $id = str_replace(" ","",$id);
-  $o .= "<tr><td width='30%' style='text-align:initial'>";
-  $o .= "<font size='2'><span class='ca_nameEdit' id='name$id' data-nameName='$scriptName' data-scriptName=".escapeshellarg($script)." style='font-size:1.9rem;cursor:pointer;color:#ff8c2f;'><i class='fa fa-gear'></i></span>&nbsp;&nbsp;<b><span style='color:#ff8c2f;'>$scriptName</span>&nbsp;</b></font><br>";
+
+  $isrunning = FALSE;
+  $isexited = FALSE;
+  $ispaused = FALSE;
+  $isup = FALSE; 
+  foreach ( $stackstate as $entry )
+  {
+    if ( strcasecmp($entry["Name"], $scriptName) == 0 ) {
+      $isup = TRUE; 
+      if ( strpos($entry["Status"], 'running') !== false ) {
+        $isrunning = TRUE;
+      }
+
+      if ( strpos($entry["Status"], 'exited') !== false ) {
+        $isexited = TRUE;
+      }
+
+      if ( strpos($entry["Status"], 'paused') !== false ) {
+        $ispaused = TRUE;
+      }
+    }
+  }
+
   if ( is_file("$compose_root/$script/description") ) {
     $description = @file_get_contents("$compose_root/$script/description");
     $description = str_replace("\r","",$description);
@@ -37,6 +61,31 @@ foreach ($composeProjects as $script) {
     }
   }
 
+  $o .= "<tr><td width='30%' style='text-align:initial'>";
+  $o .= "<font size='2'><span class='ca_nameEdit' id='name$id' data-nameName='$scriptName' data-isup='$isup' data-scriptName=".escapeshellarg($script)." style='font-size:1.9rem;cursor:pointer;color:#ff8c2f;'><i class='fa fa-gear'></i></span>&nbsp;&nbsp;<b><span style='color:#ff8c2f;'>$scriptName</span>&nbsp;</b></font>";
+  if ( $isup ) {
+    if (  $isexited && !$isrunning) {
+        $o .= "<i class='fa fa-square stopped red-text' style='margin-left: 5px;'></i>";
+    }
+    else {
+      if ( $isrunning && !$isexited && !$ispaused) {
+        $o .= "<i class='fa fa-play started green-text' style='margin-left: 5px;'></i>";
+      }
+      elseif( $ispaused && !$isexited && !$isrunning )
+      {
+        $o .= "<i class='fa fa-pause started orange-text' style='margin-left: 5px;'></i>";
+      }
+      elseif( $ispaused && !$isexited )
+      {
+        $o .= "<i class='fa fa-play started orange-text' style='margin-left: 5px;'></i>";
+      }
+      else
+      {
+        $o .= "<i class='fa fa-play started red-text' style='margin-left: 5px;'></i>";
+      }
+    }
+  }
+  $o .= "<br>";
   $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($script)." id='desc$id'>$description</span>";
   $o .= "</td>";
   $o .= "<td width=25%></td>";
@@ -74,8 +123,9 @@ $(function() {
 			var origin = $(helper.origin);
 			var myID = origin.attr('id');
 			var name = $("#"+myID).html();
+      var disabled = $("#"+myID).attr('data-isup') == "1" ? "disabled" : "";
 			var stackName = $("#"+myID).attr("data-scriptname");
-			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);'><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack'></center>");
+			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"></center>");
 		}
 	});
   $('.auto_start').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
@@ -252,7 +302,7 @@ function ComposeUp(path) {
   
   $.post(compURL,{action:'composeUp',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Up",height,width);
+      openBox(data,"Stack "+basename(path)+" Up",height,width,true);
     }
   })
 }
@@ -263,7 +313,7 @@ function ComposeDown(path) {
 
   $.post(compURL,{action:'composeDown',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Down",height,width);
+      openBox(data,"Stack "+basename(path)+" Down",height,width,true);
     }
   })
 }
@@ -274,7 +324,7 @@ function ComposePull(path) {
 
   $.post(compURL,{action:'composePull',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Pull",height,width);
+      openBox(data,"Stack "+basename(path)+" Pull",height,width,true);
     }
   })
 }

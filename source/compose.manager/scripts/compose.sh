@@ -18,6 +18,10 @@ case $1 in
     docker compose -f "$2" -p "$3" stop  2>&1
     ;;
 
+  list) 
+    docker compose ls -a --format json 2>&1
+    ;;
+
   *)
     echo -n "unknown command"
     ;;
