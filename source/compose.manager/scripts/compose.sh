@@ -22,6 +22,10 @@ case $1 in
     docker compose ls -a --format json 2>&1
     ;;
 
+  logs)
+    docker compose -f "$2" logs -f 2>&1
+    ;;
+
   *)
     echo -n "unknown command"
     ;;

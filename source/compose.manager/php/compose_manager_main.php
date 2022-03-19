@@ -131,8 +131,9 @@ $(function() {
 			var myID = origin.attr('id');
 			var name = $("#"+myID).html();
       var disabled = $("#"+myID).attr('data-isup') == "1" ? "disabled" : "";
+      var notdisabled = $("#"+myID).attr('data-isup') == "1" ? "" : "disabled";
 			var stackName = $("#"+myID).attr("data-scriptname");
-			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"></center>");
+			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
 		}
 	});
   $('.auto_start').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
@@ -187,7 +188,7 @@ function stripTags(string) {
 }
 
 function editName(myID) {
-	console.log(myID);
+	// console.log(myID);
   var currentName = $("#"+myID).attr("data-namename");
   $("#"+myID).attr("data-originalName",currentName);
   $("#"+myID).html("<input type='text' id='newName"+myID+"' value='"+currentName+"'><br><font color='red' size='4'><i class='fa fa-times' aria-hidden='true' style='cursor:pointer' onclick='cancelName(&quot;"+myID+"&quot;);'></i>&nbsp;&nbsp;<font color='green' size='4'><i style='cursor:pointer' onclick='applyName(&quot;"+myID+"&quot;);' class='fa fa-check' aria-hidden='true'></i></font>");
@@ -337,6 +338,20 @@ function ComposePull(path) {
   $.post(compURL,{action:'composePull',path:path},function(data) {
     if (data) {
       openBox(data,"Stack "+basename(path)+" Pull",height,width,true);
+    }
+  })
+}
+
+function ComposeLogs(myID) {
+  var height = 800;
+  var width = 1200;
+  $("#"+myID).tooltipster("close");
+  var script = $("#"+myID).attr("data-scriptname");
+  var path = compose_root + "/" + script;
+  console.log(path);
+  $.post(compURL,{action:'composeLogs',path:path},function(data) {
+    if (data) {
+      openBox(data,"Stack "+basename(path)+" Logs",height,width,true);
     }
   })
 }

@@ -74,5 +74,8 @@ switch ($_POST['action']) {
 	case 'composeStop':
 		echoComposeCommand('stop');
 		break;
+	case 'composeLogs':
+		echoComposeCommand('logs');
+		break;		
 }
 ?>
