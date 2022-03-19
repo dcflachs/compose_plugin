@@ -96,6 +96,7 @@ foreach ($composeProjects as $script) {
 }
 ?>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js" integrity="sha512-6ts6Fu561/yzWvD6uwQp3XVYwiWNpWnZ0hdeQrETqtnQiGjTfOS06W76aUDnq51hl1SxXtJaqy7IsZ3oP/uZEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 var compose_root=<?php echo json_encode($compose_root); ?>;
 var caURL = "/plugins/compose.manager/php/exec.php";
@@ -107,6 +108,12 @@ function basename( path ) {
 function dirname( path ) {
   return path.replace( /\\/g, '/' ).replace( /\/[^\/]*$/, '' );
 }
+
+$(function() {
+  var editor = ace.edit("itemEditor");
+  // editor.setTheme("ace/theme/monokai");
+  editor.setShowPrintMargin(false);
+})
 
 $(function() {
 	$(".tipsterallowed").show();
@@ -238,10 +245,12 @@ function editStack(myID) {
   var script = $("#"+myID).attr("data-scriptname");
   $.post(caURL,{action:'getYml',script:script},function(data) {
     if (data) {
+      var editor = ace.edit("itemEditor");
+      editor.getSession().setValue(data);
+      editor.getSession().setMode("ace/mode/yaml");
+
       $("#editStackName").html(script);
       $('#editStackFileName').html('compose.yml')
-      $("#editStack").html(data);
-      $("#editStack").val(data);
       $(".editing").show();
 			window.scrollTo(0, 0);
     }
@@ -254,10 +263,12 @@ function editEnv(myID) {
   var script = $("#"+myID).attr("data-scriptname");
   $.post(caURL,{action:'getEnv',script:script},function(data) {
     if (data) {
+      var editor = ace.edit("itemEditor");
+      editor.getSession().setValue(data);
+      editor.getSession().setMode("ace/mode/text");
+
       $("#editStackName").html(script);
       $('#editStackFileName').html('.env')
-      $("#editStack").html(data);
-      $("#editStack").val(data);
       $(".editing").show();
 			window.scrollTo(0, 0);
     }
@@ -271,7 +282,8 @@ function cancelEdit() {
 function saveEdit() {
   var script = $("#editStackName").html();
   var fileName = $("#editStackFileName").html();
-  var scriptContents = $("#editStack").val();
+  var editor = ace.edit("itemEditor");
+  var scriptContents = editor.getValue();
   var actionStr = null
 
   switch(fileName) {
@@ -330,15 +342,21 @@ function ComposePull(path) {
 }
 </script>
 
-
 <HTML>
-<HEAD></HEAD>
+<HEAD>
+<!-- <style type="text/css" media="screen">
+    #editor { 
+      position: relative !important;
+    }
+</style> -->
+</HEAD>
 <BODY>
 
 <div class='editing' hidden>
 <center><b>Editing <?=$compose_root?>/<span id='editStackName'></span>/<span id='editStackFileName'></span></b><br>
 <input type='button' value='Cancel' onclick='cancelEdit();'><input type='button' onclick='saveEdit();' value='Save Changes'><br>
-<textarea class='editing' id='editStack' style='width:90%; height:500px; border-color:red; font-family:monospace;'></textarea>
+<!-- <textarea class='editing' id='editStack' style='width:90%; height:500px; border-color:red; font-family:monospace;' ></textarea> -->
+<div id='itemEditor' style='width:90%; height:500px; position: relative;'></div>
 </center>
 </div>
 
