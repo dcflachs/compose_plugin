@@ -96,7 +96,7 @@ foreach ($composeProjects as $script) {
 }
 ?>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js" integrity="sha512-6ts6Fu561/yzWvD6uwQp3XVYwiWNpWnZ0hdeQrETqtnQiGjTfOS06W76aUDnq51hl1SxXtJaqy7IsZ3oP/uZEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/plugins/compose.manager/javascript/ace/ace.js" type= "text/javascript"></script>
 <script>
 var compose_root=<?php echo json_encode($compose_root); ?>;
 var caURL = "/plugins/compose.manager/php/exec.php";

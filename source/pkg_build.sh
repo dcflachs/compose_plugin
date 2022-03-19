@@ -40,12 +40,15 @@ chmod +x $tmpdir/usr/local/bin/docker-compose
 rm docker-compose-linux-amd64
 
 #Install Ace Editor
-mkdir $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
+mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 wget --no-check-certificate https://github.com/ajaxorg/ace-builds/archive/refs/tags/v${ACE_VERSION}.zip
 mkdir -p /tmp/ace
 unzip v${ACE_VERSION}.zip "ace-builds-${ACE_VERSION}/src-noconflict/*" -d "/tmp/ace"
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/* $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
-chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/ace.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*yaml.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*text.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 rm -R /tmp/ace
 rm v${ACE_VERSION}.zip
 
