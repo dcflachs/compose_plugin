@@ -2,8 +2,13 @@
 [ -z "$OUTPUT_FOLDER" ] && echo "Output Folder not set" && exit 1
 [ -z "$COMPOSE_VERSION" ] && echo "Compose Version not set" && exit 2
 [ -z "$COMPOSE_SWITCH_VERSION" ] && echo "Compose Switch Version not set" && exit 3
+[ -z "$ACE_VERSION" ] && echo "ACE Version not set" && exit 4
 tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 version=$(date +"%Y.%m.%d")$1
+
+#Install unzip build dependency
+wget --no-check-certificate https://slackware.uk/slackware/slackware64-14.2/slackware64/a/infozip-6.0-x86_64-3.txz
+upgradepkg --install-new infozip-6.0-x86_64-3.txz
 
 mkdir -p $tmpdir
 
@@ -33,6 +38,16 @@ mkdir -p $tmpdir/usr/local/bin
 cp docker-compose-linux-amd64 $tmpdir/usr/local/bin/docker-compose
 chmod +x $tmpdir/usr/local/bin/docker-compose
 rm docker-compose-linux-amd64
+
+#Install Ace Editor
+mkdir $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
+wget --no-check-certificate https://github.com/ajaxorg/ace-builds/archive/refs/tags/v${ACE_VERSION}.zip
+mkdir -p /tmp/ace
+unzip v${ACE_VERSION}.zip "ace-builds-${ACE_VERSION}/src-noconflict/*" -d "/tmp/ace"
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/* $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/ace/
+rm -R /tmp/ace
+rm v${ACE_VERSION}.zip
 
 makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 
