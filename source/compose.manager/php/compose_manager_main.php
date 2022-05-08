@@ -1,6 +1,7 @@
 <?PHP
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
+require_once("/usr/local/emhttp/plugins/compose.manager/php/util.php");
 
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 
@@ -29,7 +30,7 @@ foreach ($composeProjects as $script) {
   $isup = FALSE; 
   foreach ( $stackstate as $entry )
   {
-    if ( strcasecmp($entry["Name"], $scriptName) == 0 ) {
+    if ( strcasecmp($entry["Name"], sanitizeStr($scriptName)) == 0 ) {
       $isup = TRUE; 
       if ( strpos($entry["Status"], 'running') !== false ) {
         $isrunning = TRUE;

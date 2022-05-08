@@ -1,17 +1,12 @@
 <?php
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
+require_once("/usr/local/emhttp/plugins/compose.manager/php/util.php");
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 
 function logger($string) {
 	$string = escapeshellarg($string);
 	exec("logger ".$string);
-}
-
-function sanitizeStr($a) {
-	$a = str_replace(".","_",$a);
-	$a = str_replace(" ","_",$a);
-	return str_replace("-","_",$a);
 }
 
 function execComposeCommandInTTY($cmd)
