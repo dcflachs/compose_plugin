@@ -102,6 +102,7 @@ foreach ($composeProjects as $script) {
 var compose_root=<?php echo json_encode($compose_root); ?>;
 var caURL = "/plugins/compose.manager/php/exec.php";
 var compURL = "/plugins/compose.manager/php/compose_util.php";
+var aceTheme=<?php echo (in_array($theme,['black','gray']) ? json_encode('ace/theme/tomorrow_night') : json_encode('ace/theme/tomorrow')); ?>;
 function basename( path ) {
   return path.replace( /\\/g, '/' ).replace( /.*\//, '' );
 }
@@ -112,7 +113,7 @@ function dirname( path ) {
 
 $(function() {
   var editor = ace.edit("itemEditor");
-  // editor.setTheme("ace/theme/monokai");
+  editor.setTheme(aceTheme);
   editor.setShowPrintMargin(false);
 })
 

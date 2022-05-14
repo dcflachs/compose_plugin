@@ -48,6 +48,9 @@ cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/ace.js $tmpdir/usr/local/em
 cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*yaml.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*text.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*tomorrow.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*tomorrow_night.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 rm -R /tmp/ace
 rm v${ACE_VERSION}.zip
