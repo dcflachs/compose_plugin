@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2022.05.08">
+<!ENTITY version     "2022.05.14">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "2f25ae49b71353b0ffcda126653a2ee0">
+<!ENTITY packageMD5  "cd6d0b27602feded6eee556a84dedd7c">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,11 @@
 >
 
 <CHANGES>
+###2022.05.14
+- Change default output style to terminal.
+- Added theme support.
+- Docker Compose v2.5.0
+- Compose Switch v1.0.4
 ###2022.05.08
 - Bugfix for stack names containing spaces.
 ###2022.03.19 
