@@ -15,7 +15,7 @@ $cfg = parse_plugin_cfg($sName);
 _(Compose Command Progress Display)_:
 : <select name="OUTPUTSTYLE">
   <?=mk_option($cfg['OUTPUTSTYLE'], "basic", _("Basic"))?>
-  <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Experimental"))?>
+  <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Terminal"))?>
   </select>
 
 <input type="submit" name="#default" value="_(Default)_">
