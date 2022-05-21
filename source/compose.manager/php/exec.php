@@ -57,7 +57,7 @@ switch ($_POST['action']) {
         $scriptContents = str_replace("\r","",$scriptContents);
         echo $scriptContents;
         if ( ! $scriptContents ) {
-            echo "version: '3'\nservices:\n";
+            echo "services:\n";
         }
         break;
     case 'saveYml':
