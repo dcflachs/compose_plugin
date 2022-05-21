@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export HOME=/root
+
 case $1 in
 
   up)
