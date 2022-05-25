@@ -6,6 +6,8 @@
 tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 version=$(date +"%Y.%m.%d")$1
 
+shopt -s extglob
+
 #Install unzip build dependency
 wget --no-check-certificate https://slackware.uk/slackware/slackware64-14.2/slackware64/a/infozip-6.0-x86_64-3.txz
 upgradepkg --install-new infozip-6.0-x86_64-3.txz
@@ -44,12 +46,12 @@ mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 wget --no-check-certificate https://github.com/ajaxorg/ace-builds/archive/refs/tags/v${ACE_VERSION}.zip
 mkdir -p /tmp/ace
 unzip v${ACE_VERSION}.zip "ace-builds-${ACE_VERSION}/src-noconflict/*" -d "/tmp/ace"
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/ace.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*yaml.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*text.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/!(mode-*|theme-*) $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*yaml.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*text.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*tomorrow.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
-cp /tmp/ace/ace-builds-${ACE_VERSION}/src-noconflict/*tomorrow_night.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*tomorrow.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
+cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*tomorrow_night.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 rm -R /tmp/ace
