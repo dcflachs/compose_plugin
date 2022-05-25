@@ -59,6 +59,12 @@ makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 
 cd /
 
-echo "MD5:"
+MD5=`md5sum $OUTPUT_FOLDER/compose.manager-package-${version}.txz`
 
-md5sum $OUTPUT_FOLDER/compose.manager-package-${version}.txz
+echo "MD5: $MD5"
+
+echo "Compose v${COMPOSE_VERSION}" >> $OUTPUT_FOLDER/release_info
+echo "Compose Switch v${COMPOSE_SWITCH_VERSION}" >> $OUTPUT_FOLDER/release_info
+echo "Ace v${ACE_VERSION}" >> $OUTPUT_FOLDER/release_info
+echo "" >> $OUTPUT_FOLDER/release_info
+echo "MD5: $(echo $MD5 | head -n1 | awk '{print $1;}')" >> $OUTPUT_FOLDER/release_info
