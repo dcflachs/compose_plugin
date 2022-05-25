@@ -7,8 +7,8 @@ for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
         if [ -f "$dir/compose.yml" ]; then
             # echo "$dir/compose.yml"
-            logger "Stopping compose stack: $(cat $dir/Name)"
-            $COMPOSE_WRAPPER stop "$dir/compose.yml" "$(cat $dir/Name)" > /dev/null &
+            logger "Stopping compose stack: $(cat $dir/name)"
+            $COMPOSE_WRAPPER stop "$dir/compose.yml" "$(cat $dir/name)" > /dev/null &
         fi
     fi
 done
