@@ -66,7 +66,7 @@ jobs:
       with:
         tag_name:  ${{env.RELEASE_TAG_NAME}}
         release_name: Compose Manager Package ${{env.RELEASE_TAG_NAME}}
-        boady_path: ./archive/release_info
+        body_path: ./archive/release_info
         draft: true
         prerelease: false
     
