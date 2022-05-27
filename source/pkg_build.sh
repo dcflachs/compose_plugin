@@ -45,7 +45,7 @@ rm docker-compose-linux-amd64
 mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 wget --no-check-certificate https://github.com/ajaxorg/ace-builds/archive/refs/tags/v${ACE_VERSION}.zip
 mkdir -p /tmp/ace
-unzip v${ACE_VERSION}.zip "ace-builds-${ACE_VERSION}/src-noconflict/*" -d "/tmp/ace"
+unzip v${ACE_VERSION}.zip "ace-builds-${ACE_VERSION}/src-min-noconflict/*" -d "/tmp/ace"
 cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/!(mode-*|theme-*) $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*yaml.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*text.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
