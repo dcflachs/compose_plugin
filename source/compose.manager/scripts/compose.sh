@@ -5,19 +5,23 @@ export HOME=/root
 case $1 in
 
   up)
-    docker compose -f "$2" -p "$3" up -d 2>&1
+    cd $2
+    docker compose -p "$3" up -d 2>&1
     ;;
 
   down)
-    docker compose -f "$2" -p "$3" down  2>&1
+    cd $2
+    docker compose -p "$3" down  2>&1
     ;;
 
   pull)
-    docker compose -f "$2" -p "$3" pull  2>&1
+    cd $2
+    docker compose -p "$3" pull  2>&1
     ;;
 
   stop)
-    docker compose -f "$2" -p "$3" stop  2>&1
+    cd $2
+    docker compose -p "$3" stop  2>&1
     ;;
 
   list) 
@@ -25,7 +29,8 @@ case $1 in
     ;;
 
   logs)
-    docker compose -f "$2" logs -f 2>&1
+    cd $2
+    docker compose logs -f 2>&1
     ;;
 
   *)

@@ -13,7 +13,7 @@ if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
 }
 foreach ($composeProjects as $script) {
-  if ( ! is_file("$compose_root/$script/compose.yml") ) {
+  if ( ! is_file("$compose_root/$script/docker-compose.yml") ) {
     continue;
   }
 
@@ -253,7 +253,7 @@ function editStack(myID) {
       editor.getSession().setMode("ace/mode/yaml");
 
       $("#editStackName").html(script);
-      $('#editStackFileName').html('compose.yml')
+      $('#editStackFileName').html('docker-compose.yml')
       $(".editing").show();
 			window.scrollTo(0, 0);
     }
@@ -290,7 +290,7 @@ function saveEdit() {
   var actionStr = null
 
   switch(fileName) {
-    case 'compose.yml':
+    case 'docker-compose.yml':
       actionStr = 'saveYml'
       break;
 
