@@ -5,12 +5,12 @@ COMPOSE_WRAPPER=/usr/local/emhttp/plugins/compose.manager/scripts/compose.sh
 
 for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
-        if [ -f "$dir/compose.yml" ]; then
+        if [ -f "$dir/docker-compose.yml" ]; then
             if [ -f "$dir/autostart" ]; then
                 if [ 'true' == "$(cat $dir/autostart)" ]; then
-                    # echo "$dir/compose.yml"
+                    # echo "$dir/docker-compose.yml"
                     logger "Starting compose stack: $(cat $dir/name)"
-                    $COMPOSE_WRAPPER up "$dir/compose.yml" "$(cat $dir/name)" > /dev/null &
+                    $COMPOSE_WRAPPER up "$dir" "$(cat $dir/name)" > /dev/null &
                 fi
             fi
         fi

@@ -26,7 +26,7 @@ switch ($_POST['action']) {
           }
         }
         exec("mkdir -p ".escapeshellarg($folder));
-        file_put_contents("$folder/compose.yml","version: '3'\nservices:\n");
+        file_put_contents("$folder/docker-compose.yml","version: '3'\nservices:\n");
         file_put_contents("$folder/name",$stackName);
         echo "ok";
         break;
@@ -53,7 +53,7 @@ switch ($_POST['action']) {
         break;
     case 'getYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
-        $scriptContents = file_get_contents("$compose_root/$script/compose.yml");
+        $scriptContents = file_get_contents("$compose_root/$script/docker-compose.yml");
         $scriptContents = str_replace("\r","",$scriptContents);
         echo $scriptContents;
         if ( ! $scriptContents ) {
@@ -64,8 +64,8 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
     //		$scriptContents = preg_replace('/[\x80-\xFF]/', '', $scriptContents);
-        file_put_contents("$compose_root/$script/compose.yml",$scriptContents);
-        echo "$compose_root/$script/compose.yml saved";
+        file_put_contents("$compose_root/$script/docker-compose.yml",$scriptContents);
+        echo "$compose_root/$script/docker-compose.yml saved";
         break;
     case 'getEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";

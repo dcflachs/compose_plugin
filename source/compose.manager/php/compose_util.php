@@ -39,7 +39,6 @@ function echoComposeCommand($action)
 			$projectName = trim(file_get_contents("$path/name"));
 		}
 		$projectName = sanitizeStr($projectName);
-		$path .= "/compose.yml";
 
 		if ($cfg['OUTPUTSTYLE'] == "ttyd") {
 			$composeCommand = join(" ", array(escapeshellarg($plugin_root."scripts/compose.sh"),escapeshellarg($action),escapeshellarg($path),escapeshellarg($projectName)));
