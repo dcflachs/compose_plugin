@@ -1,7 +1,10 @@
 #!/bin/bash
 
 export HOME=/root
-export DOCKER_JSON=/usr/local/emhttp/state/plugins/dynamix.docker.manager/docker.json
+DOCKER_MANAGER=/usr/local/emhttp/state/plugins/dynamix.docker.manager
+DOCKER_JSON=$DOCKER_MANAGER/docker.json
+DOCKER_IMAGES=$DOCKER_MANAGER/images
+UNRAID_IMAGES=/var/lib/docker/unraid/images
 
 case $1 in
 
@@ -9,6 +12,9 @@ case $1 in
     docker compose -f "$2" -p "$3" ps -a |
       awk '{if (NR!=1) {printf("%s.\"%s\"", sep, $1); sep=", "}}' |
       xargs -0 -I {} jq 'del({})' $DOCKER_JSON > $DOCKER_JSON
+    docker compose -f "$2" -p "$3" ps -a |
+      awk '{if (NR!=1) {print $1}}' |
+      xargs -I {} find $DOCKER_IMAGES $UNRAID_IMAGES -name {}.png -delete
     docker compose -f "$2" -p "$3" up -d 2>&1
     ;;
 
@@ -16,6 +22,9 @@ case $1 in
     docker compose -f "$2" -p "$3" ps -a |
       awk '{if (NR!=1) {printf("%s.\"%s\"", sep, $1); sep=", "}}' |
       xargs -0 -I {} jq 'del({})' $DOCKER_JSON > $DOCKER_JSON
+    docker compose -f "$2" -p "$3" ps -a |
+      awk '{if (NR!=1) {print $1}}' |
+      xargs -I {} find $DOCKER_IMAGES $UNRAID_IMAGES -name {}.png -delete
     docker compose -f "$2" -p "$3" down  2>&1
     ;;
 
