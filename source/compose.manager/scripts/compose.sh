@@ -1,14 +1,21 @@
 #!/bin/bash
 
 export HOME=/root
+export DOCKER_JSON=/usr/local/emhttp/state/plugins/dynamix.docker.manager/docker.json
 
 case $1 in
 
   up)
+    docker compose -f "$2" -p "$3" ps -a |
+      awk '{if (NR!=1) {printf("%s.\"%s\"", sep, $1); sep=", "}}' |
+      xargs -0 -I {} jq 'del({})' $DOCKER_JSON > $DOCKER_JSON
     docker compose -f "$2" -p "$3" up -d 2>&1
     ;;
 
   down)
+    docker compose -f "$2" -p "$3" ps -a |
+      awk '{if (NR!=1) {printf("%s.\"%s\"", sep, $1); sep=", "}}' |
+      xargs -0 -I {} jq 'del({})' $DOCKER_JSON > $DOCKER_JSON
     docker compose -f "$2" -p "$3" down  2>&1
     ;;
 
