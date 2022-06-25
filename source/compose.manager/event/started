@@ -10,7 +10,7 @@ for dir in $COMPOSE_ROOT/*; do
                 if [ 'true' == "$(cat $dir/autostart)" ]; then
                     # echo "$dir/compose.yml"
                     logger "Starting compose stack: $(cat $dir/name)"
-                    $COMPOSE_WRAPPER up "$dir/compose.yml" "$(cat $dir/name)" > /dev/null &
+                    $COMPOSE_WRAPPER -c up -f "$dir/compose.yml" -p "$(cat $dir/name)" > /dev/null &
                 fi
             fi
         fi
