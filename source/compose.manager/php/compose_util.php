@@ -39,11 +39,18 @@ function echoComposeCommand($action)
 			$projectName = trim(file_get_contents("$path/name"));
 		}
 		$projectName = sanitizeStr($projectName);
-		$path .= "/compose.yml";
 
 		$projectName = "-p$projectName";
-		$path = "-f$path";
 		$action = "-c$action";
+
+		if( isIndirect($path) ) {
+			$path = getPath($path);
+			$path = "-d$path";
+		} 
+		else {
+			$path .= "/compose.yml";
+			$path = "-f$path";
+		}
 
 		if ($cfg['OUTPUTSTYLE'] == "ttyd") {
 			$composeCommand = join(" ", array(escapeshellarg($plugin_root."scripts/compose.sh"),escapeshellarg($action),escapeshellarg($path),escapeshellarg($projectName)));

@@ -3,6 +3,7 @@
 [ -z "$COMPOSE_VERSION" ] && echo "Compose Version not set" && exit 2
 [ -z "$COMPOSE_SWITCH_VERSION" ] && echo "Compose Switch Version not set" && exit 3
 [ -z "$ACE_VERSION" ] && echo "ACE Version not set" && exit 4
+[ -z "$SWEETALERT_VERSION" ] && echo "Sweetalert Version not set" && exit 5
 tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 version=$(date +"%Y.%m.%d")$1
 
@@ -56,6 +57,18 @@ cp /tmp/ace/ace-builds-${ACE_VERSION}/src-min-noconflict/*tomorrow_night.js $tmp
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/ace/
 rm -R /tmp/ace
 rm v${ACE_VERSION}.zip
+
+#Install SweetAlert 2
+wget --no-check-certificate https://unpkg.com/sweetalert@$SWEETALERT_VERSION/dist/sweetalert.min.js
+mkdir -p $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert
+mv sweetalert.min.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert
+
+#Modify SweetAlert 2 for compatability
+sed -i '' 's/exports.swal/exports.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i '' 's/t.swal/t.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i '' 's/e.sweetAlert/e.sweetAlert2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i '' 's/e.swal/e.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
 
 makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 

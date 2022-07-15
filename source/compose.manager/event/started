@@ -5,12 +5,20 @@ COMPOSE_WRAPPER=/usr/local/emhttp/plugins/compose.manager/scripts/compose.sh
 
 for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
-        if [ -f "$dir/compose.yml" ]; then
+        if [ -f "$dir/compose.yml" ] || [ -f "$dir/indirect" ]; then
             if [ -f "$dir/autostart" ]; then
-                if [ 'true' == "$(cat $dir/autostart)" ]; then
-                    # echo "$dir/compose.yml"
-                    logger "Starting compose stack: $(cat $dir/name)"
-                    $COMPOSE_WRAPPER -c up -f "$dir/compose.yml" -p "$(cat $dir/name)" > /dev/null &
+                autostart=${dir}/autostart
+                if [ 'true' == "$(< "${autostart}" )" ]; then
+                    name=${dir}/name
+                    name=$(< "${name}")
+                    logger "Starting compose stack: ${name// /_}"
+                    if [ -f "$dir/indirect" ]; then
+                        indirect=${dir}/indirect
+                        indirect=$(< "${indirect}")
+                        $COMPOSE_WRAPPER -c up -d "${indirect}" -p "${name// /_}" > /dev/null &
+                    else
+                        $COMPOSE_WRAPPER -c up -f "$dir/compose.yml" -p "${name// /_}" > /dev/null &
+                    fi
                 fi
             fi
         fi

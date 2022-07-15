@@ -1,15 +1,31 @@
 <?php
 
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
+require_once("/usr/local/emhttp/plugins/compose.manager/php/util.php");
 
 function getElement($element) {
     $return = str_replace(".","-",$element);
     $return = str_replace(" ","",$return);
     return $return;
-  }
+}
 
 switch ($_POST['action']) {
     case 'addStack':
+        #Create indirect
+        $indirect = isset($_POST['stackPath']) ? urldecode(($_POST['stackPath'])) : "";
+        if ( !empty($indirect) ) {
+            if ( !is_dir($indirect) ) {
+                exec("mkdir -p ".escapeshellarg($indirect));
+                if( !is_dir($indirect)  ) {
+                    echo json_encode( [ 'result' => 'error', 'message' => 'Failed to create stack directory.' ] );
+                    break;
+                }
+            }
+        }
+
+        #Pull stack files
+
+        #Create stack folder
         $stackName = isset($_POST['stackName']) ? urldecode(($_POST['stackName'])) : "";
         $folderName = str_replace('"',"",$stackName);
         $folderName = str_replace("'","",$folderName);
@@ -26,67 +42,94 @@ switch ($_POST['action']) {
           }
         }
         exec("mkdir -p ".escapeshellarg($folder));
-        file_put_contents("$folder/compose.yml","version: '3'\nservices:\n");
+        if( !is_dir($folder)  ) {
+            echo json_encode( [ 'result' => 'error', 'message' => 'Failed to create stack directory.' ] );
+            break;
+        }
+
+        #Create stack files
+        if ( !empty($indirect) ) {
+            file_put_contents("$folder/indirect",$indirect);
+            if ( !is_file("$indirect/compose.yml") ) {
+                file_put_contents("$indirect/compose.yml","services:\n");
+            }
+        } else {
+            file_put_contents("$folder/compose.yml","services:\n");
+        }
+
         file_put_contents("$folder/name",$stackName);
-        echo "ok";
+
+        echo json_encode( [ 'result' => 'success', 'message' => '' ] );
         break;
     case 'deleteStack':
         $stackName = isset($_POST['stackName']) ? urldecode(($_POST['stackName'])) : "";
         if ( ! $stackName ) {
-          echo "huh?";
+            echo json_encode( [ 'result' => 'error', 'message' => 'Stack not specified.' ] );
           break;
         }
         $folderName = "$compose_root/$stackName";
+        $filesRemain = is_file("$folderName/indirect") ? file_get_contents("$folderName/indirect") : "";
         exec("rm -rf ".escapeshellarg($folderName));
-        echo "deleted";
+        if ( !empty($filesRemain) ){
+            echo json_encode( [ 'result' => 'warning', 'message' => $filesRemain ] );
+        } else {
+            echo json_encode( [ 'result' => 'success', 'message' => '' ] );
+        }
         break;
     case 'changeName':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $newName = isset($_POST['newName']) ? urldecode(($_POST['newName'])) : "";
         file_put_contents("$compose_root/$script/name",trim($newName));
-        echo "ok";
+        echo json_encode( [ 'result' => 'success', 'message' => '' ] );
         break;
     case 'changeDesc':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $newDesc = isset($_POST['newDesc']) ? urldecode(($_POST['newDesc'])) : "";
         file_put_contents("$compose_root/$script/description",trim($newDesc));
+        echo json_encode( [ 'result' => 'success', 'message' => '' ] );
         break;
     case 'getYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
-        $scriptContents = file_get_contents("$compose_root/$script/compose.yml");
+        $basePath = getPath("$compose_root/$script");
+
+        $scriptContents = file_get_contents("$basePath/compose.yml");
         $scriptContents = str_replace("\r","",$scriptContents);
-        echo $scriptContents;
         if ( ! $scriptContents ) {
-            echo "services:\n";
+            $scriptContents = "services:\n";
         }
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/compose.yml", 'content' => $scriptContents ] );
         break;
     case 'saveYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
-    //		$scriptContents = preg_replace('/[\x80-\xFF]/', '', $scriptContents);
-        file_put_contents("$compose_root/$script/compose.yml",$scriptContents);
-        echo "$compose_root/$script/compose.yml saved";
+        $basePath = getPath("$compose_root/$script");
+
+        file_put_contents("$basePath/compose.yml",$scriptContents);
+        echo "$basePath/compose.yml saved";
         break;
     case 'getEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
-        $scriptContents = is_file("$compose_root/$script/.env") ? file_get_contents("$compose_root/$script/.env") : "";
+        $basePath = getPath("$compose_root/$script");
+
+        $scriptContents = is_file("$basePath/.env") ? file_get_contents("$basePath/.env") : "";
         $scriptContents = str_replace("\r","",$scriptContents);
-        echo $scriptContents;
         if ( ! $scriptContents ) {
-            echo "\n";
+            $scriptContents = "\n";
         }
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/.env", 'content' => $scriptContents ] );
         break;
     case 'saveEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
-    //		$scriptContents = preg_replace('/[\x80-\xFF]/', '', $scriptContents);
-        file_put_contents("$compose_root/$script/.env",$scriptContents);
-        echo "$compose_root/$script/.env saved";
+        $basePath = getPath("$compose_root/$script");
+
+        file_put_contents("$basePath/.env",$scriptContents);
+        echo "$basePath/.env saved";
         break;
     case 'updateAutostart':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         if ( ! $script ) {
-            echo "huh?";
+            echo json_encode( [ 'result' => 'error', 'message' => 'Stack not specified.' ] );
             break;
         }
         $autostart = isset($_POST['autostart']) ? urldecode(($_POST['autostart'])) : "false";
@@ -95,6 +138,7 @@ switch ($_POST['action']) {
             exec("rm ".escapeshellarg($fileName));
         }
         file_put_contents($fileName,$autostart);
+        echo json_encode( [ 'result' => 'success', 'message' => '' ] );
         break;
 }
 

@@ -13,7 +13,8 @@ if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
 }
 foreach ($composeProjects as $script) {
-  if ( ! is_file("$compose_root/$script/compose.yml") ) {
+  if ( ( ! is_file("$compose_root/$script/compose.yml") ) &&
+       ( ! is_file("$compose_root/$script/indirect") ) ) {
     continue;
   }
 
@@ -98,11 +99,17 @@ foreach ($composeProjects as $script) {
 ?>
 
 <script src="/plugins/compose.manager/javascript/ace/ace.js" type= "text/javascript"></script>
+<!-- <script src="/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js" type= "text/javascript"></script> -->
 <script>
 var compose_root=<?php echo json_encode($compose_root); ?>;
 var caURL = "/plugins/compose.manager/php/exec.php";
 var compURL = "/plugins/compose.manager/php/compose_util.php";
 var aceTheme=<?php echo (in_array($theme,['black','gray']) ? json_encode('ace/theme/tomorrow_night') : json_encode('ace/theme/tomorrow')); ?>;
+
+if (typeof swal2 === "undefined") {
+		$.getScript( '/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js');
+}
+
 function basename( path ) {
   return path.replace( /\\/g, '/' ).replace( /.*\//, '' );
 }
@@ -147,41 +154,100 @@ $(function() {
 });
 
 function addStack() {
-  swal({
+  var form = document.createElement("div");
+  // form.classList.add("swal-content");
+  form.innerHTML = `<input type="text" id="stack_name" class="swal-content__input" placeholder="stack_name">
+                    <br>
+                    <details>
+                      <summary style="text-align: left">Advanced</summary>
+                      <br>
+                      <div class="swal-text">Stack Directory</div>
+                      <input type="text" id="stack_path" class="swal-content__input" pattern="\/mnt\/.*\/.*" oninput="this.reportValidity()" title="A path under /mnt/user/ or mnt/cache/ or mnt/pool/" style="margin-top: 20px" placeholder="default">
+                      <div style="display:none;">
+                        <div class="swal-text">Pull From Github</div>
+                        <input type="url" id="git_url" class="swal-content__input" style="margin-top: 20px" placeholder="https://github.com/example/repo.git">
+                      </div>
+                    </details>`;
+  swal2({
     title: "Add New Compose Stack",
     text: "Enter in the name for the stack",
-    type: "input",
-    inputValue: "",
-    inputPlaceHolder: "Command Arguments",
-    showCancelButton: true,
-    closeOnConfirm: true
-  },function(inputValue){
+    content: form,
+    buttons: true,
+  }).then((inputValue) => {
     if (inputValue) {
-      $.post(caURL,{action:'addStack',stackName:inputValue},function(data) {
-        if (data) {
-          location.reload();
-        }
-      });
+      var new_stack_name = document.getElementById("stack_name").value;
+      var new_stack_dir = document.getElementById("stack_path").value;
+      var git_url = document.getElementById("git_url").value;
+      if (!new_stack_name) {
+        swal2({
+          title: "Failed to create stack.",
+          text: "Stack name unspecified.",
+          icon: "error",
+        })
+      }
+      else {
+        $.post(
+          caURL,
+          {action:'addStack',stackName:new_stack_name,stackPath:new_stack_dir},
+          function(data) {
+            var title = "Failed to create stack.";
+            var message = "";
+            var icon = "error";
+            if (data) {
+              var response = jQuery.parseJSON(data);
+              if (response.result == "success") {
+                title = "Success";
+              }
+              message = response.message;
+              icon = response.result;
+            }
+            swal2({
+              title: title,
+              text: message,
+              icon: icon,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        );        
+      }
     }
   });
 }
 
 function deleteStack(myID) {
   var stackName = $("#"+myID).attr("data-scriptname");
-  var script = $("#"+myID).html();
-  swal({
-    text: "Are you sure you want to delete <font color='red'><b>"+script+"</b></font> (<font color='green'>"+compose_root+"/"+stackName+"</font>)?",
+  var script = $("#"+myID).attr("data-namename");
+  var element = document.createElement("div")
+  element.innerHTML = "Are you sure you want to delete <font color='red'><b>"+script+"</b></font> (<font color='green'>"+compose_root+"/"+stackName+"</font>)?"; 
+  swal2({
+    content: element,
     title: "Delete Stack?",
-    type: "warning",
-    showCancelButton: true,
-    closeOnConfirm: true,
-    html: true
-  },function(){
-    $.post(caURL,{action:'deleteStack',stackName:stackName},function(data) {
-      if (data) {
-        location.reload();
-      }
-    });
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((willDelete) => {
+    if (willDelete) {
+      $.post(caURL,{action:'deleteStack',stackName:stackName},function(data) {
+        if (data) {
+          var response = jQuery.parseJSON(data);
+          if (response.result == "warning") {
+            title = "Success";
+            swal2({
+              title: "Files remain on disk.",
+              text: response.message,
+              icon: "warning",
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            location.reload();
+          }
+        } else {
+            location.reload();
+        }
+      });
+    }
   });
 }
 
@@ -248,12 +314,14 @@ function editStack(myID) {
   var script = $("#"+myID).attr("data-scriptname");
   $.post(caURL,{action:'getYml',script:script},function(data) {
     if (data) {
+      var response = jQuery.parseJSON(data);
       var editor = ace.edit("itemEditor");
-      editor.getSession().setValue(data);
+      editor.getSession().setValue(response.content);
       editor.getSession().setMode("ace/mode/yaml");
 
-      $("#editStackName").html(script);
-      $('#editStackFileName').html('compose.yml')
+      $('#editorFileName').data("stackname", script);
+      $('#editorFileName').data("stackfilename", "compose.yml")
+      $('#editorFileName').html(response.fileName)
       $(".editing").show();
 			window.scrollTo(0, 0);
     }
@@ -266,12 +334,14 @@ function editEnv(myID) {
   var script = $("#"+myID).attr("data-scriptname");
   $.post(caURL,{action:'getEnv',script:script},function(data) {
     if (data) {
+      var response = jQuery.parseJSON(data);
       var editor = ace.edit("itemEditor");
-      editor.getSession().setValue(data);
+      editor.getSession().setValue(response.content);
       editor.getSession().setMode("ace/mode/text");
 
-      $("#editStackName").html(script);
-      $('#editStackFileName').html('.env')
+      $('#editorFileName').data("stackname", script);
+      $('#editorFileName').data("stackfilename", ".env")
+      $('#editorFileName').html(response.fileName)
       $(".editing").show();
 			window.scrollTo(0, 0);
     }
@@ -283,8 +353,8 @@ function cancelEdit() {
 }
 
 function saveEdit() {
-  var script = $("#editStackName").html();
-  var fileName = $("#editStackFileName").html();
+  var script = $("#editorFileName").data("stackname");
+  var fileName = $("#editorFileName").data("stackfilename");
   var editor = ace.edit("itemEditor");
   var scriptContents = editor.getValue();
   var actionStr = null
@@ -370,7 +440,8 @@ function ComposeLogs(myID) {
 <BODY>
 
 <div class='editing' hidden>
-<center><b>Editing <?=$compose_root?>/<span id='editStackName'></span>/<span id='editStackFileName'></span></b><br>
+<!-- <center><b>Editing <?=$compose_root?>/<span id='editStackName'></span>/<span id='editStackFileName'></span></b><br> -->
+<center><b>Editing <span id='editorFileName' data-stackname="" data-stackfilename=""></span></b><br>
 <input type='button' value='Cancel' onclick='cancelEdit();'><input type='button' onclick='saveEdit();' value='Save Changes'><br>
 <!-- <textarea class='editing' id='editStack' style='width:90%; height:500px; border-color:red; font-family:monospace;' ></textarea> -->
 <div id='itemEditor' style='width:90%; height:500px; position: relative;'></div>
