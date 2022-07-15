@@ -13,7 +13,7 @@ if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
 }
 foreach ($composeProjects as $script) {
-  if ( ( ! is_file("$compose_root/$script/compose.yml") ) &&
+  if ( ( ! is_file("$compose_root/$script/docker-compose.yml") ) &&
        ( ! is_file("$compose_root/$script/indirect") ) ) {
     continue;
   }
@@ -320,7 +320,7 @@ function editStack(myID) {
       editor.getSession().setMode("ace/mode/yaml");
 
       $('#editorFileName').data("stackname", script);
-      $('#editorFileName').data("stackfilename", "compose.yml")
+      $('#editorFileName').data("stackfilename", "docker-compose.yml")
       $('#editorFileName').html(response.fileName)
       $(".editing").show();
 			window.scrollTo(0, 0);
@@ -360,7 +360,7 @@ function saveEdit() {
   var actionStr = null
 
   switch(fileName) {
-    case 'compose.yml':
+    case 'docker-compose.yml':
       actionStr = 'saveYml'
       break;
 

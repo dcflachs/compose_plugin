@@ -48,7 +48,7 @@ function echoComposeCommand($action)
 			$path = "-d$path";
 		} 
 		else {
-			$path .= "/compose.yml";
+			$path .= "/docker-compose.yml";
 			$path = "-f$path";
 		}
 

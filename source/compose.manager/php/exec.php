@@ -50,11 +50,11 @@ switch ($_POST['action']) {
         #Create stack files
         if ( !empty($indirect) ) {
             file_put_contents("$folder/indirect",$indirect);
-            if ( !is_file("$indirect/compose.yml") ) {
-                file_put_contents("$indirect/compose.yml","services:\n");
+            if ( !is_file("$indirect/docker-compose.yml") ) {
+                file_put_contents("$indirect/docker-compose.yml","services:\n");
             }
         } else {
-            file_put_contents("$folder/compose.yml","services:\n");
+            file_put_contents("$folder/docker-compose.yml","services:\n");
         }
 
         file_put_contents("$folder/name",$stackName);
@@ -92,20 +92,20 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $basePath = getPath("$compose_root/$script");
 
-        $scriptContents = file_get_contents("$basePath/compose.yml");
+        $scriptContents = file_get_contents("$basePath/docker-compose.yml");
         $scriptContents = str_replace("\r","",$scriptContents);
         if ( ! $scriptContents ) {
             $scriptContents = "services:\n";
         }
-        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/compose.yml", 'content' => $scriptContents ] );
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/docker-compose.yml", 'content' => $scriptContents ] );
         break;
     case 'saveYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
 
-        file_put_contents("$basePath/compose.yml",$scriptContents);
-        echo "$basePath/compose.yml saved";
+        file_put_contents("$basePath/docker-compose.yml",$scriptContents);
+        echo "$basePath/docker-compose.yml saved";
         break;
     case 'getEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
