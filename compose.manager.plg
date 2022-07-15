@@ -73,7 +73,7 @@ rm -f $(ls &pluginLOC;/&name;*.txz 2>/dev/null|grep -v '&packageVER;')
 #Create projects folder if it doesnt exist
 mkdir -p &pluginLOC;/projects
 
-if [[! -f &pluginLOC;/projects/version ]]; then
+if [[ ! -f "&pluginLOC;/projects/version" ]]; then
     #Upgrade projects to latest format
     for dir in &pluginLOC;/projects/*; do
         if [[ -d $dir ]]; then
@@ -82,9 +82,9 @@ if [[! -f &pluginLOC;/projects/version ]]; then
             fi
         fi
     done
-fi
 
-echo "1" > &pluginLOC;/projects/version
+    echo "1" > &pluginLOC;/projects/version
+fi
 </INLINE>
 </FILE>
 
