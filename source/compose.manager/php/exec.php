@@ -91,40 +91,44 @@ switch ($_POST['action']) {
     case 'getYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $basePath = getPath("$compose_root/$script");
+        $fileName = "docker-compose.yml";
 
-        $scriptContents = file_get_contents("$basePath/docker-compose.yml");
+        $scriptContents = file_get_contents("$basePath/$fileName");
         $scriptContents = str_replace("\r","",$scriptContents);
         if ( ! $scriptContents ) {
             $scriptContents = "services:\n";
         }
-        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/docker-compose.yml", 'content' => $scriptContents ] );
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/$fileName", 'content' => $scriptContents ] );
+        break;
+    case 'getEnv':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $basePath = getPath("$compose_root/$script");
+        $fileName = ".env";
+
+        $scriptContents = is_file("$basePath/$fileName") ? file_get_contents("$basePath/$fileName") : "";
+        $scriptContents = str_replace("\r","",$scriptContents);
+        if ( ! $scriptContents ) {
+            $scriptContents = "\n";
+        }
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/$fileName", 'content' => $scriptContents ] );
         break;
     case 'saveYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
-
-        file_put_contents("$basePath/docker-compose.yml",$scriptContents);
-        echo "$basePath/docker-compose.yml saved";
-        break;
-    case 'getEnv':
-        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
-        $basePath = getPath("$compose_root/$script");
-
-        $scriptContents = is_file("$basePath/.env") ? file_get_contents("$basePath/.env") : "";
-        $scriptContents = str_replace("\r","",$scriptContents);
-        if ( ! $scriptContents ) {
-            $scriptContents = "\n";
-        }
-        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/.env", 'content' => $scriptContents ] );
+        $fileName = "docker-compose.yml";
+    
+        file_put_contents("$basePath/$fileName",$scriptContents);
+        echo "$basePath/$fileName saved";
         break;
     case 'saveEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
+        $fileName = ".env";
 
-        file_put_contents("$basePath/.env",$scriptContents);
-        echo "$basePath/.env saved";
+        file_put_contents("$basePath/$fileName",$scriptContents);
+        echo "$basePath/$fileName saved";
         break;
     case 'updateAutostart':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";

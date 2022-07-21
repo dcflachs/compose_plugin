@@ -142,7 +142,8 @@ $(function() {
       var disabled = $("#"+myID).attr('data-isup') == "1" ? "disabled" : "";
       var notdisabled = $("#"+myID).attr('data-isup') == "1" ? "" : "disabled";
 			var stackName = $("#"+myID).attr("data-scriptname");
-			instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
+			// instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
+      instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
 		}
 	});
   $('.auto_start').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
@@ -309,6 +310,35 @@ function applyDesc(myID) {
 }
 
 function editStack(myID) {
+  var buttonsList = {};
+
+  buttonsList["compose_file"] = { text: "Compose File" };
+  buttonsList["env_file"] = { text: "ENV File" };
+
+  buttonsList["Cancel"] = { text: "Cancel", value: null, };
+  swal2({
+    title: "Select Stack File to Edit",
+    className: 'edit-stack-form',
+    buttons: buttonsList,
+  }).then((result) => {
+    if (result) {
+      switch(result) {
+        case 'compose_file':
+          editComposeFile(myID);
+          break;
+        case 'env_file':
+          editEnv(myID);
+          break;
+
+        default:
+          return;
+      }
+    }
+  });
+
+}
+
+function editComposeFile(myID) {
   var origID = myID;
   $("#"+myID).tooltipster("close");
   var script = $("#"+myID).attr("data-scriptname");
@@ -431,11 +461,19 @@ function ComposeLogs(myID) {
 
 <HTML>
 <HEAD>
-<!-- <style type="text/css" media="screen">
-    #editor { 
-      position: relative !important;
-    }
-</style> -->
+<style type="text/css">
+.edit-stack-form .swal-footer {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+}
+.edit-stack-form .swal-footer .swal-button-container {
+   	display: table-row;
+}
+.edit-stack-form .swal-footer .swal-button-container .swal-button{
+   	width: 150px;
+}
+</style>
 </HEAD>
 <BODY>
 
