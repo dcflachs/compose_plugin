@@ -112,6 +112,18 @@ switch ($_POST['action']) {
         }
         echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/$fileName", 'content' => $scriptContents ] );
         break;
+    case 'getOverride':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $basePath = "$compose_root/$script";
+        $fileName = "docker-compose.override.yml";
+
+        $scriptContents = is_file("$basePath/$fileName") ? file_get_contents("$basePath/$fileName") : "";
+        $scriptContents = str_replace("\r","",$scriptContents);
+        if ( ! $scriptContents ) {
+            $scriptContents = "";
+        }
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/$fileName", 'content' => $scriptContents ] );
+        break;
     case 'saveYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
@@ -126,6 +138,15 @@ switch ($_POST['action']) {
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
         $fileName = ".env";
+
+        file_put_contents("$basePath/$fileName",$scriptContents);
+        echo "$basePath/$fileName saved";
+        break;
+    case 'saveOverride':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
+        $basePath = "$compose_root/$script";
+        $fileName = "docker-compose.override.yml";
 
         file_put_contents("$basePath/$fileName",$scriptContents);
         echo "$basePath/$fileName saved";
