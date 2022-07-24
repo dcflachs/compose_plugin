@@ -11,13 +11,17 @@ for dir in $COMPOSE_ROOT/*; do
                 if [ 'true' == "$(< "${autostart}" )" ]; then
                     name=${dir}/name
                     name=$(< "${name}")
+                    override=""
+                    if [ -f "$dir/docker-compose.override.yml" ]; then
+                        override="-o$dir/docker-compose.override.yml"
+                    fi
                     logger "Starting compose stack: ${name// /_}"
                     if [ -f "$dir/indirect" ]; then
                         indirect=${dir}/indirect
                         indirect=$(< "${indirect}")
-                        $COMPOSE_WRAPPER -c up -d "${indirect}" -p "${name// /_}" > /dev/null &
+                        $COMPOSE_WRAPPER -c up -d "${indirect}" -p "${name// /_}" $override > /dev/null &
                     else
-                        $COMPOSE_WRAPPER -c up -f "$dir/docker-compose.yml" -p "${name// /_}" > /dev/null &
+                        $COMPOSE_WRAPPER -c up -f "$dir/docker-compose.yml" -p "${name// /_}" $override > /dev/null &
                     fi
                 fi
             fi

@@ -8,13 +8,17 @@ for dir in $COMPOSE_ROOT/*; do
         if [ -f "$dir/docker-compose.yml" ] || [ -f "$dir/indirect" ]; then
             name=${dir}/name
             name=$(< "${name}")
+            override=""
+            if [ -f "$dir/docker-compose.override.yml" ]; then
+                override="-o$dir/docker-compose.override.yml"
+            fi
             logger "Stopping compose stack: ${name// /_}"
             if [ -f "$dir/indirect" ]; then
                 indirect=${dir}/indirect
                 indirect=$(< "${indirect}")
-                $COMPOSE_WRAPPER -c stop -d "${indirect}" -p "${name// /_}" > /dev/null &
+                $COMPOSE_WRAPPER -c stop -d "${indirect}" -p "${name// /_}" $override > /dev/null &
             else
-                $COMPOSE_WRAPPER -c stop -f "$dir/docker-compose.yml" -p "${name// /_}" > /dev/null &
+                $COMPOSE_WRAPPER -c stop -f "$dir/docker-compose.yml" -p "${name// /_}" $override > /dev/null &
             fi
         fi
     fi

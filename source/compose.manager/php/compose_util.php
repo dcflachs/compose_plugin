@@ -34,6 +34,8 @@ function echoComposeCommand($action)
 	}
 	else
 	{
+		$composeCommand = array($plugin_root."scripts/compose.sh");
+
 		$projectName = basename($path);
 		if ( is_file("$path/name") ) {
 			$projectName = trim(file_get_contents("$path/name"));
@@ -42,24 +44,44 @@ function echoComposeCommand($action)
 
 		$projectName = "-p$projectName";
 		$action = "-c$action";
+		$composeCommand[] = $action;
+		$composeCommand[] = $projectName;
 
 		if( isIndirect($path) ) {
-			$path = getPath($path);
-			$path = "-d$path";
+			$composeFile = getPath($path);
+			$composeFile = "-d$composeFile";
 		} 
 		else {
-			$path .= "/docker-compose.yml";
-			$path = "-f$path";
+			$composeFile .= "$path/docker-compose.yml";
+			$composeFile = "-f$composeFile";
+		}
+		$composeCommand[] = $composeFile;
+
+		if ( is_file("$path/docker-compose.override.yml") ) {
+			$composeOverride = "-o$path/docker-compose.override.yml";
+			$composeCommand[] = $composeOverride;
 		}
 
 		if ($cfg['OUTPUTSTYLE'] == "ttyd") {
-			$composeCommand = join(" ", array(escapeshellarg($plugin_root."scripts/compose.sh"),escapeshellarg($action),escapeshellarg($path),escapeshellarg($projectName)));
+			$composeCommand = array_map(function($item) {
+				return escapeshellarg($item);
+			}, $composeCommand);
+			$composeCommand = join(" ", $composeCommand);
 			execComposeCommandInTTY($composeCommand);
 			logger($composeCommand);
 			$composeCommand = "/plugins/compose.manager/php/show_ttyd.php";
 		}
 		else {
-			$composeCommand = $plugin_root."/scripts/compose.sh"."&arg1=".$action."&arg2=".$path."&arg3=".$projectName;
+			$i = 0;
+			$composeCommand = array_reduce($composeCommand, function($v1, $v2) use (&$i) {
+				if ($v2[0] == "-") {
+					$i++; // increment $i
+					return $v1."&arg".$i."=".$v2;
+				}
+				else{
+					return $v1.$v2;
+				}
+			}, "");
 		}
 		
 		echo $composeCommand;

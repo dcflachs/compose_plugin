@@ -144,7 +144,6 @@ $(function() {
       var disabled = $("#"+myID).attr('data-isup') == "1" ? "disabled" : "";
       var notdisabled = $("#"+myID).attr('data-isup') == "1" ? "" : "disabled";
 			var stackName = $("#"+myID).attr("data-scriptname");
-			// instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='editEnv(&quot;"+myID+"&quot;);' value='Edit ENV'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
       instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
 		}
 	});
@@ -362,9 +361,13 @@ function override_find_labels( primary, secondary, label ) {
   return value;
 }
 
-function generateOverride(myID) {
-  $("#"+myID).tooltipster("close");
-  var script = $("#"+myID).attr("data-scriptname");
+function generateOverride(myID, myScript=null) {
+  var script = myScript;
+  if( myID ) {
+    $("#"+myID).tooltipster("close");
+    script = $("#"+myID).attr("data-scriptname");
+  }
+    
   $.post(caURL,{action:'getOverride',script:script},function(rawOverride) {
     if (rawOverride) {
       var rawOverride = jQuery.parseJSON(rawOverride);
@@ -405,15 +408,15 @@ function generateOverride(myID) {
             }
             var deleted_entries = ``;
             for( var service_key in override_doc.services ) {
-              if( !service_key in main_doc.services ) {
-                var name = main_doc.services[service_key].container_name || service_key;
+              if( !(service_key in main_doc.services) ) {
+                var name = override_doc.services[service_key].container_name || service_key;
                 deleted_entries += `<div class="swal-text" style="font-weight: bold; padding-left: 0px; margin-top: 0px;">Service: ${name}</div>`;
                 deleted_entries += `<br>`;
 
-                var icon_value = override_find_labels(override_doc.services[service_key], main_doc.services[service_key], icon_label);
+                var icon_value = override_find_labels(override_doc.services[service_key], override_doc.services[service_key], icon_label);
                 deleted_entries += build_override_input_table(`${service_key}_icon_d`, icon_value, "Icon", "", true);
                 
-                var webui_value = override_find_labels(override_doc.services[service_key], main_doc.services[service_key], webui_label);
+                var webui_value = override_find_labels(override_doc.services[service_key], override_doc.services[service_key], webui_label);
                 deleted_entries += build_override_input_table(`${service_key}_webui_d`, webui_value, "Web UI", "", true);
               }
             }
@@ -534,6 +537,9 @@ function saveEdit() {
   $.post(caURL,{action:actionStr,script:script,scriptContents:scriptContents},function(data) {
     if (data) {
       $(".editing").hide();
+      if (actionStr == 'saveYml') {
+        generateOverride(null,script);
+      }
     }
   });
 
