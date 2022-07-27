@@ -58,7 +58,7 @@ function echoComposeCommand($action)
 		$composeCommand[] = $composeFile;
 
 		if ( is_file("$path/docker-compose.override.yml") ) {
-			$composeOverride = "-o$path/docker-compose.override.yml";
+			$composeOverride = "-f$path/docker-compose.override.yml";
 			$composeCommand[] = $composeOverride;
 		}
 
