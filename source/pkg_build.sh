@@ -65,10 +65,10 @@ mv sweetalert.min.js $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript
 chmod -R +x $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert
 
 #Modify SweetAlert 2 for compatability
-sed -i '' 's/exports.swal/exports.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
-sed -i '' 's/t.swal/t.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
-sed -i '' 's/e.sweetAlert/e.sweetAlert2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
-sed -i '' 's/e.swal/e.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i'' 's/exports.swal/exports.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i'' 's/t.swal/t.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i'' 's/e.sweetAlert/e.sweetAlert2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
+sed -i'' 's/e.swal/e.swal2/' $tmpdir/usr/local/emhttp/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js
 
 makepkg -l y -c y $OUTPUT_FOLDER/compose.manager-package-${version}.txz
 
