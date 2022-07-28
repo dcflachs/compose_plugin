@@ -164,7 +164,7 @@ function addStack() {
                       <summary style="text-align: left">Advanced</summary>
                       <br>
                       <div class="swal-text">Stack Directory</div>
-                      <input type="text" id="stack_path" class="swal-content__input" pattern="\/mnt\/.*\/.*" oninput="this.reportValidity()" title="A path under /mnt/user/ or mnt/cache/ or mnt/pool/" style="margin-top: 20px" placeholder="default">
+                      <input type="text" id="stack_path" class="swal-content__input" pattern="\/mnt\/.*\/.*" oninput="this.reportValidity()" title="A path under /mnt/user/ or /mnt/cache/ or /mnt/pool/" style="margin-top: 20px" placeholder="default">
                       <div style="display:none;">
                         <div class="swal-text">Pull From Github</div>
                         <input type="url" id="git_url" class="swal-content__input" style="margin-top: 20px" placeholder="https://github.com/example/repo.git">
