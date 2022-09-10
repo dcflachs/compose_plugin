@@ -53,8 +53,8 @@ case $command in
     eval docker compose $files -p "$name" down  2>&1
     ;;
 
-  pull)
-    eval docker compose $files -p "$name" pull  2>&1
+  update)
+    eval docker compose $files -p "$name" up -d --pull always --build 2>&1
     ;;
 
   stop)

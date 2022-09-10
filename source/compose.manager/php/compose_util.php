@@ -96,8 +96,8 @@ switch ($_POST['action']) {
 	case 'composeDown':
 		echoComposeCommand('down');
 		break;
-	case 'composePull':
-		echoComposeCommand('pull');
+	case 'composeUpPullBuild':
+		echoComposeCommand('update');
 		break;
 	case 'composeStop':
 		echoComposeCommand('stop');

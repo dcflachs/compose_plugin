@@ -93,8 +93,9 @@ foreach ($composeProjects as $script) {
   $o .= "<td width=25%></td>";
   $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
   $o .= "<td width=5%><input type='button' value='Compose Down' class='down$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Pull' class='pull$id' id='$id' onclick='ComposePull(&quot;$compose_root/$script&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Update Stack' class='update$id' id='$id' onclick='UpdateStack(&quot;$compose_root/$script&quot;);'></td>";
   $o .= "<td width=5%><input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($script)." id='$id' style='display:none' $autostart></td>";
+  $o .= "</tr>";
 }
 ?>
 
@@ -567,13 +568,13 @@ function ComposeDown(path) {
   })
 }
 
-function ComposePull(path) {
+function UpdateStack(path) {
   var height = 800;
   var width = 1200;
 
-  $.post(compURL,{action:'composePull',path:path},function(data) {
+  $.post(compURL,{action:'composeUpPullBuild',path:path},function(data) {
     if (data) {
-      openBox(data,"Stack "+basename(path)+" Pull",height,width,true);
+      openBox(data,"Update Stack "+basename(path),height,width,true);
     }
   })
 }
@@ -602,10 +603,10 @@ function ComposeLogs(myID) {
   margin-right: auto;
 }
 .edit-stack-form .swal-footer .swal-button-container {
-   	display: table-row;
+  display: table-row;
 }
-.edit-stack-form .swal-footer .swal-button-container .swal-button{
-   	width: 150px;
+.edit-stack-form .swal-footer .swal-button-container .swal-button {
+  width: 150px;
 }
 </style>
 </HEAD>
