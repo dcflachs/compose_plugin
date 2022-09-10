@@ -622,7 +622,7 @@ function ComposeLogs(myID) {
 </div>
 
 <span class='tipsterallowed' hidden></span><br>
-<table>
+<table class="tablesorter">
 <thead><tr><th style="text-align:left">Stack</th><th></th><th style="text-align:left" colspan="3">Commands</th><th style="text-align:left">Auto Start</th></tr></thead>
 <?=$o?>
 </table>
