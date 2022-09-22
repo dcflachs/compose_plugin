@@ -1,7 +1,0 @@
-Author="dcflachs"
-Title="Compose"
-Type="php"
-Menu="Docker:2"
-Cond="(pgrep('dockerd')!==false)"
----
-<?php include '/usr/local/emhttp/plugins/compose.manager/php/compose_manager_main.php';?>

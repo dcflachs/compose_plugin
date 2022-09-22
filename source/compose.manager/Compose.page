@@ -1,0 +1,8 @@
+Author="dcflachs"
+Title="Docker Compose"
+Type="php"
+Menu="Tasks:61"
+Tag="cubes"
+Cond="(pgrep('dockerd')!==false)"
+---
+<?php include '/usr/local/emhttp/plugins/compose.manager/php/compose_manager_main.php';?>
