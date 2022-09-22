@@ -165,6 +165,12 @@ switch ($_POST['action']) {
         file_put_contents($fileName,$autostart);
         echo json_encode( [ 'result' => 'success', 'message' => '' ] );
         break;
+    case 'patchUI':
+        exec("$plugin_root/scripts/patch_ui.sh");
+        break;
+    case 'unPatchUI':
+        exec("$plugin_root/scripts/patch_ui.sh -r");
+        break;
 }
 
 ?>

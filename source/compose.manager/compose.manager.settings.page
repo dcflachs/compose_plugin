@@ -5,9 +5,27 @@ Type="xmenu"
 Menu="Utilities"
 ---
 <?php 
+include "/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php";
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 $cfg = parse_plugin_cfg($sName);
+$ui_patch_button_type = (strcmp($cfg['PATCH_UI'],"true") == 0 && !isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
+$ui_unpatch_button_type = (strcmp($cfg['PATCH_UI'],"false") == 0 && isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
 ?>
+<script>
+var caURL = "/plugins/compose.manager/php/exec.php";
+
+function patchWebui() {
+  $.post(caURL,{action:'patchUI'}, function(data) {
+    window.location.reload();
+  })
+}
+
+function unpatchWebui() {
+  $.post(caURL,{action:'unPatchUI'}, function(data) {
+    window.location.reload();
+  })
+}
+</script>
 
 <form markdown="1" name="compose_manager_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="<?=$sName?>/<?=$sName?>.cfg">
@@ -17,6 +35,14 @@ _(Compose Command Progress Display)_:
   <?=mk_option($cfg['OUTPUTSTYLE'], "basic", _("Basic"))?>
   <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Terminal"))?>
   </select>
+
+_(Patch unRAID WebUI)_:
+: <select name="PATCH_UI">
+  <?=mk_option($cfg['PATCH_UI'], "false", _("False"))?>
+  <?=mk_option($cfg['PATCH_UI'], "true", _("True"))?>
+  </select>
+  <input type=<?=$ui_patch_button_type?> value="_(Patch)_" onclick="patchWebui()">
+  <input type=<?=$ui_unpatch_button_type?> value="_(Unpatch)_" onclick="unpatchWebui()">
 
 <input type="submit" name="#default" value="_(Default)_">
 : <input type="submit" name="#apply" value="_(Apply)_" disabled><input type="button" value="_(Done)_" onclick="done()">

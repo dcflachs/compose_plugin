@@ -105,6 +105,22 @@ fi
 
 <FILE Run="/bin/bash">
 <INLINE>
+#Grab the contents of our config file.
+source <(grep = /boot/config/plugins/compose.manager/compose.manager.cfg)
+patch_ui=${PATCH_UI:='false'}
+
+if [ $patch_ui == 'true' ]; then
+#Remove patchs if already applied
+/usr/local/emhttp/plugins/compose.manager/scripts/patch_ui.sh -r
+
+#Apply Patches
+/usr/local/emhttp/plugins/compose.manager/scripts/patch_ui.sh
+fi
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."

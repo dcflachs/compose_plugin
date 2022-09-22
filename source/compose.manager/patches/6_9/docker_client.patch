@@ -1,0 +1,94 @@
+12a13
+> $composemanDockerClientPatch=True;
+298c299,305
+< 			if (!is_file($tmp['icon']) || $reload) $tmp['icon'] = $this->getIcon($image,$name);
+---
+> 			// read docker label for WebUI & Icon
+> 			if ($ct['Url'] && !$tmp['url']) $tmp['url'] = $ct['Url'];
+> 			if ($ct['Icon']) $tmp['icon'] = $ct['Icon'];
+> 			if ($ct['Shell']) $tmp['shell'] = $ct['Shell'];
+> 
+> 			if (!is_file($tmp['icon']) || $reload) $tmp['icon'] = $this->getIcon($image,$name,$ct['Icon']);
+> 
+301,302c308,315
+< 				$ip = ($ct['NetworkMode']=='host'||$port['NAT'] ? $host : $port['IP']);
+< 				$tmp['url'] = $ip ? (strpos($tmp['url'],$ip)!==false ? $tmp['url'] : $this->getControlURL($ct, $ip)) : $tmp['url'];
+---
+> 				$webui = $tmp['url'] ?: $this->getTemplateValue($ct['Image'], 'WebUI');
+> 				if (strlen($webui) > 0 && !preg_match("%\[(IP|PORT:(\d+))\]%", $webui)) {
+> 					// non-templated webui, user specified
+> 					$tmp['url'] = $webui;
+> 				} else {
+> 					$ip = ($ct['NetworkMode']=='host'||$port['NAT'] ? $host : $port['IP']);
+> 					$tmp['url'] = $ip ? (strpos($tmp['url'],$ip)!==false ? $tmp['url'] : $this->getControlURL($ct, $ip)) : $tmp['url'];
+> 				}
+307a321
+> 			if (strpos($ct['Manager'],"composeman")!==false) $tmp['updated'] = 'undef';
+321c335
+< 	public function getIcon($Repository,$contName) {
+---
+> 	public function getIcon($Repository,$contName,$iconUrl='') {
+323,324c337,341
+< 		$imgUrl = $this->getTemplateValue($Repository, 'Icon','all',$contName);
+< 		if (!$imgUrl) return '';
+---
+> 		$imgUrl = $iconUrl ?: $this->getTemplateValue($Repository, 'Icon','all',$contName);
+> 		if (!$imgUrl || trim($imgUrl) == "/plugins/dynamix.docker.manager/images/question.png") return '';
+> 
+> 		$imgUrlHash = sha1($imgUrl);
+> 		$iconFile = sprintf('%s-%s.png', 'icon', $imgUrlHash);
+326,328c343,344
+< 		$imageName = $contName ?: $name;
+< 		$iconRAM = sprintf('%s/%s-%s.png', $dockerManPaths['images-ram'], $contName, 'icon');
+< 		$icon    = sprintf('%s/%s-%s.png', $dockerManPaths['images'], $contName, 'icon');
+---
+> 		$iconRAM = sprintf('%s/%s-%s', $dockerManPaths['images-ram'], $contName, $iconFile);
+> 		$icon    = sprintf('%s/%s', $dockerManPaths['images'], $iconFile);
+338c354
+< 			@copy($iconRAM,$icon);
+---
+> 			@copy($iconRAM, $icon);
+339a356,362
+> 		if ( !is_file($iconRAM) ) {
+> 			exec("/usr/bin/logger ".escapeshellarg("$contName: Could not download icon $imgUrl"));
+> 		}
+> 		else {
+> 			$this->purgeUnusedIconFiles($contName, $iconFile);
+> 		}
+> 
+341a365,394
+> 
+> 	public function purgeUnusedIconFiles($contName, $keepIcon='') {
+> 		global $docroot, $dockerManPaths;
+> 
+> 		$icon_glob = sprintf('%s/%s-*.png', $dockerManPaths['images-ram'], $contName);
+> 		$ramFiles = glob($icon_glob);
+> 		foreach ($ramFiles as $filename) {
+> 			if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
+> 				@unlink($filename);
+> 			}
+> 		}
+> 
+> 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
+> 		foreach (glob($icon_glob) as $filename) {
+> 			if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
+> 				@unlink($filename);
+> 			}
+> 		}	
+> 
+> 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
+> 		foreach ($ramFiles as $ramFile) {
+> 			if ( strpos($ramFile, '-icon-') !== false ) {
+> 				$suffix = end(explode('-', $ramFile));
+> 				if ( !glob($dockerManPaths['images-ram'].'/*icon-'.$suffix) ) {
+> 					$filename = sprintf('%s/icon-%s', $dockerManPaths['images'], $suffix);
+> 					@unlink($filename);
+> 				}
+> 			}
+> 		}
+> 	}
+882a936,939
+> 			$c['Icon']        = $info['Config']['Labels']['net.unraid.docker.icon'] ?? false;
+> 			$c['Url']         = $info['Config']['Labels']['net.unraid.docker.webui'] ?? false;
+> 			$c['Shell']       = $info['Config']['Labels']['net.unraid.docker.shell'] ?? false;
+> 			$c['Manager']  	  = $info['Config']['Labels']['net.unraid.docker.managed'] ?? false;
