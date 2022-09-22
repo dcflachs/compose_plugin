@@ -5,27 +5,10 @@ Type="xmenu"
 Menu="Utilities"
 ---
 <?php 
-include "/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php";
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 $cfg = parse_plugin_cfg($sName);
-$ui_patch_button_type = (strcmp($cfg['PATCH_UI'],"true") == 0 && !isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
-$ui_unpatch_button_type = (strcmp($cfg['PATCH_UI'],"false") == 0 && isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
+$menu_cfg = file_get_contents($plugin_root . 'Compose.page');
 ?>
-<script>
-var caURL = "/plugins/compose.manager/php/exec.php";
-
-function patchWebui() {
-  $.post(caURL,{action:'patchUI'}, function(data) {
-    window.location.reload();
-  })
-}
-
-function unpatchWebui() {
-  $.post(caURL,{action:'unPatchUI'}, function(data) {
-    window.location.reload();
-  })
-}
-</script>
 
 <form markdown="1" name="compose_manager_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="<?=$sName?>/<?=$sName?>.cfg">
@@ -36,14 +19,20 @@ _(Compose Command Progress Display)_:
   <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Terminal"))?>
   </select>
 
-_(Patch unRAID WebUI)_:
-: <select name="PATCH_UI">
-  <?=mk_option($cfg['PATCH_UI'], "false", _("False"))?>
-  <?=mk_option($cfg['PATCH_UI'], "true", _("True"))?>
+_(Compose Location)_:
+: <select name="LOCATION">
+  <?=mk_option($cfg['LOCATION'], "docker", _("Docker Page"))?>
+  <?=mk_option($cfg['LOCATION'], "header", _("Header menu"))?>
   </select>
-  <input type=<?=$ui_patch_button_type?> value="_(Patch)_" onclick="patchWebui()">
-  <input type=<?=$ui_unpatch_button_type?> value="_(Unpatch)_" onclick="unpatchWebui()">
+
+<?php if( $cfg['LOCATION'] == "docker" ) {
+$menu_cfg = preg_replace('/Menu=.*/ui', 'Menu="Docker:2"', $menu_cfg);
+file_put_contents($plugin_root . 'Compose.page', $menu_cfg);
+} else {
+$menu_cfg = preg_replace('/Menu=.*/ui', 'Menu="Tasks:61"', $menu_cfg);
+file_put_contents($plugin_root . 'Compose.page', $menu_cfg);
+} ?>
 
 <input type="submit" name="#default" value="_(Default)_">
-: <input type="submit" name="#apply" value="_(Apply)_" disabled><input type="button" value="_(Done)_" onclick="done()">
+: <input type="submit" name="#apply" value="_(Apply)_" onSubmit="window.location.reload()" disabled><input type="button" value="_(Done)_" onclick="done()">
 </form>
