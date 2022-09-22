@@ -105,6 +105,15 @@ fi
 
 <FILE Run="/bin/bash">
 <INLINE>
+# Modify Compose.page to match the choosen display options
+MENU_LOCATION="$(cat /boot/config/plugins/compose.manager/compose.manager.cfg 2>/dev/null | grep "LOCATION=" | cut -d '=' -f2 | sed 's/"//g')"
+if [ ! -z "${MENU_LOCATION}" ]; then
+    if [ "${MENU_LOCATION}" == "docker" ]; then
+        sed -i "/Menu=/c\Menu=Menu=\"Docker:2\"" /usr/local/emhttp/plugins/compose.manager/Compose.page
+    elif [ "${MENU_LOCATION}" == "header" ]; then
+        sed -i "/Menu=/c\Menu=\"Tasks:61\"" /usr/local/emhttp/plugins/compose.manager/Compose.page
+    fi
+fi
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."
