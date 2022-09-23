@@ -36,13 +36,26 @@ _(Compose Command Progress Display)_:
   <?=mk_option($cfg['OUTPUTSTYLE'], "ttyd", _("Terminal"))?>
   </select>
 
+<blockquote class="inline_help" style="display: none;">
+  Choose the style of output for plugin commands.<br>
+  When set to <strong>basic</strong> the output will be simple text as elsewhere in the webui.<br>
+  When set to <strong>ttyd</strong> the output will be a terminal window with colored text.
+</blockquote>
+
 _(Patch unRAID WebUI)_:
 : <select name="PATCH_UI">
-  <?=mk_option($cfg['PATCH_UI'], "false", _("False"))?>
-  <?=mk_option($cfg['PATCH_UI'], "true", _("True"))?>
+  <?=mk_option($cfg['PATCH_UI'], "false", _("No"))?>
+  <?=mk_option($cfg['PATCH_UI'], "true", _("Yes"))?>
   </select>
+  <span class="fa fa-question-circle fa-fw" onclick="HelpButton();return false;"></span>
   <input type=<?=$ui_patch_button_type?> value="_(Patch)_" onclick="patchWebui()">
   <input type=<?=$ui_unpatch_button_type?> value="_(Unpatch)_" onclick="unpatchWebui()">
+
+<blockquote class="inline_help" style="display: none;">
+  Apply patches to the webui to improve the integration of containers started by compose.manager.<br>
+  When set to <strong>yes</strong> the patches can be activated with the <strong>Patch</strong> button or by reboot.<br>
+  When set to <strong>no</strong> the patches can be removed with the <strong>Unpatch</strong> button or by reboot.<br>
+</blockquote>
 
 <input type="submit" name="#default" value="_(Default)_">
 : <input type="submit" name="#apply" value="_(Apply)_" disabled><input type="button" value="_(Done)_" onclick="done()">
