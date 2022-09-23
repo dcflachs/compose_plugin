@@ -101,6 +101,30 @@ fi
 <FILE Name="&pluginLOC;/&packagefile;" Run="upgradepkg --install-new">
 <URL>&packageURL;</URL>
 <MD5>&packageMD5;</MD5>
+</FILE> 
+
+<FILE Run="/bin/bash">
+<INLINE>
+patch_script=/usr/local/emhttp/plugins/compose.manager/scripts/patch_ui.sh
+if [ -f "$patch_script" ]; then
+    #Grab the contents of our config file.
+    source &lt;(grep = /boot/config/plugins/compose.manager/compose.manager.cfg)
+    patch_ui=${PATCH_UI:='false'}
+
+    if [ $patch_ui == 'true' ]; then
+        echo ""
+        echo "----------------------------------------------------"
+        echo " Applying WebUI Patches..."
+        echo "----------------------------------------------------"
+        echo ""
+        #Remove patchs if already applied
+        $patch_script -r
+
+        #Apply Patches
+        $patch_script
+    fi
+fi
+</INLINE>
 </FILE>
 
 <FILE Run="/bin/bash">
@@ -116,6 +140,12 @@ echo ""
 
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
+#Remove patchs if already applied
+patch_remove_script=/usr/local/emhttp/plugins/compose.manager/scripts/patch_ui.sh
+if [ -f "$patch_remove_script" ]; then
+    $patch_remove_script -r
+fi
+
 removepkg &packageName;
 
 # Remove plugin related files
