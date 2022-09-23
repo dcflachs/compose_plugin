@@ -108,6 +108,7 @@ var compURL = "/plugins/compose.manager/php/compose_util.php";
 var aceTheme=<?php echo (in_array($theme,['black','gray']) ? json_encode('ace/theme/tomorrow_night') : json_encode('ace/theme/tomorrow')); ?>;
 const icon_label = <?php echo json_encode($docker_label_icon); ?>;
 const webui_label = <?php echo json_encode($docker_label_webui); ?>;
+const shell_label = <?php echo json_encode($docker_label_shell); ?>;
 
 if (typeof swal2 === "undefined") {
 		$.getScript( '/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js');
@@ -405,6 +406,9 @@ function generateOverride(myID, myScript=null) {
                 
                 var webui_value = override_find_labels(override_doc.services[service_key], main_doc.services[service_key], webui_label);
                 html += build_override_input_table(`${service_key}_webui`, webui_value, "Web UI", "web ui");
+
+                var shell_value = override_find_labels(override_doc.services[service_key], main_doc.services[service_key], shell_label);
+                html += build_override_input_table(`${service_key}_shell`, shell_value, "Shell", "shell");
               }
             }
             var deleted_entries = ``;
@@ -419,6 +423,9 @@ function generateOverride(myID, myScript=null) {
                 
                 var webui_value = override_find_labels(override_doc.services[service_key], override_doc.services[service_key], webui_label);
                 deleted_entries += build_override_input_table(`${service_key}_webui_d`, webui_value, "Web UI", "", true);
+
+                var shell_value = override_find_labels(override_doc.services[service_key], override_doc.services[service_key], shell_label);
+                deleted_entries += build_override_input_table(`${service_key}_shell_d`, shell_value, "Shell", "", true);
               }
             }
             if( deleted_entries ) {
@@ -442,9 +449,11 @@ function generateOverride(myID, myScript=null) {
                   if( service_key in main_doc.services ) {
                     var new_icon = document.getElementById(`${service_key}_icon`).value;
                     var new_webui = document.getElementById(`${service_key}_webui`).value;
+                    var new_shell = document.getElementById(`${service_key}_shell`).value;
 
                     override_doc.services[service_key].labels[icon_label] = new_icon;
                     override_doc.services[service_key].labels[webui_label] = new_webui;
+                    override_doc.services[service_key].labels[shell_label] = new_shell;
                   }
                   else {
                     delete override_doc.services[service_key];
