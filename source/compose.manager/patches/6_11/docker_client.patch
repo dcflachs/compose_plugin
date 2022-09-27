@@ -1,0 +1,70 @@
+12a13
+> $composemanDockerClientPatch=True;
+325a327
+> 			if (strpos($ct['Manager'],"composeman")!==false) $tmp['updated'] = 'undef';
+340c342
+< 	public function getIcon($Repository,$contName,$tmpIconUrl='') {
+---
+> 	public function getIcon($Repository,$contName,$iconUrl='') {
+342,343c344
+< 		$imgUrl = $this->getTemplateValue($Repository, 'Icon','all',$contName);
+< 		if (!$imgUrl) $imgUrl = $tmpIconUrl;
+---
+> 		$imgUrl = $iconUrl ?: $this->getTemplateValue($Repository, 'Icon','all',$contName);
+346,348c347,351
+< 		$imageName = $contName ?: $name;
+< 		$iconRAM = sprintf('%s/%s-%s.png', $dockerManPaths['images-ram'], $contName, 'icon');
+< 		$icon    = sprintf('%s/%s-%s.png', $dockerManPaths['images'], $contName, 'icon');
+---
+> 		$imgUrlHash = sha1($imgUrl);
+> 		$iconFile = sprintf('%s-%s.png', 'icon', $imgUrlHash);
+> 
+> 		$iconRAM = sprintf('%s/%s-%s', $dockerManPaths['images-ram'], $contName, $iconFile);
+> 		$icon    = sprintf('%s/%s', $dockerManPaths['images'], $iconFile);
+358c361
+< 			@copy($iconRAM,$icon);
+---
+> 			@copy($iconRAM, $icon);
+361c364,367
+< 			exec("/usr/bin/logger ".escapeshellarg("$imageName: Could not download icon $imgUrl"));
+---
+> 			exec("/usr/bin/logger ".escapeshellarg("$contName: Could not download icon $imgUrl"));
+> 		}
+> 		else {
+> 			$this->purgeUnusedIconFiles($contName, $iconFile);
+365a372,401
+> 
+> 	public function purgeUnusedIconFiles($contName, $keepIcon='') {
+> 		global $docroot, $dockerManPaths;
+> 
+> 		$icon_glob = sprintf('%s/%s-*.png', $dockerManPaths['images-ram'], $contName);
+> 		$ramFiles = glob($icon_glob);
+> 		foreach ($ramFiles as $filename) {
+> 			if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
+> 				@unlink($filename);
+> 			}
+> 		}
+> 
+> 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
+> 		foreach (glob($icon_glob) as $filename) {
+> 			if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
+> 				@unlink($filename);
+> 			}
+> 		}	
+> 
+> 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
+> 		foreach ($ramFiles as $ramFile) {
+> 			if ( strpos($ramFile, '-icon-') !== false ) {
+> 				$suffix = end(explode('-', $ramFile));
+> 				if ( !glob($dockerManPaths['images-ram'].'/*icon-'.$suffix) ) {
+> 					$filename = sprintf('%s/icon-%s', $dockerManPaths['images'], $suffix);
+> 					@unlink($filename);
+> 				}
+> 			}
+> 		}
+> 	}
+917c953,954
+< 			$c['Shell']         = $info['Config']['Labels']['net.unraid.docker.shell'] ?? false;
+---
+> 			$c['Shell']       = $info['Config']['Labels']['net.unraid.docker.shell'] ?? false;
+> 			$c['Manager']  	  = $info['Config']['Labels']['net.unraid.docker.managed'] ?? false;

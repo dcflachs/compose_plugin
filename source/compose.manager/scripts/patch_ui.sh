@@ -34,6 +34,8 @@ if [ ! -z $(grep -Po "6.10.\d+" /etc/unraid-version ) ]; then
   patch_folder="$patch_folder/6_10"
 elif [ ! -z $(grep -Po "6.9.2" /etc/unraid-version ) ]; then
   patch_folder="$patch_folder/6_9"
+elif [ ! -z $(grep -Po "6.11.\d+" /etc/unraid-version ) ]; then
+  patch_folder="$patch_folder/6_11"
 else
   exit 2
 fi
