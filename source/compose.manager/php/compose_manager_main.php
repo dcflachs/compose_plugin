@@ -111,6 +111,7 @@ const webui_label = <?php echo json_encode($docker_label_webui); ?>;
 const shell_label = <?php echo json_encode($docker_label_shell); ?>;
 
 if (typeof swal2 === "undefined") {
+    $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', '<?autov("/plugins/compose.manager/styles/sweetalert2.css");?>') );
 		$.getScript( '/plugins/compose.manager/javascript/sweetalert/sweetalert2.min.js');
 }
 
