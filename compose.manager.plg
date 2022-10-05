@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2022.09.27">
+<!ENTITY version     "2022.10.05">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "c017f4128ec1e625c38b07c48550cf33">
+<!ENTITY packageMD5  "8a59e467c316dfd9e005e92ee2d5570a">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,9 @@
 >
 
 <CHANGES>
+###2022.10.05 
+- Docker Compose v2.11.2
+- Fix styling when unassigned devices plugin is not installed.
 ###2022.09.27 
 - Replace compose pull function with update stack.
 - Tweak the look of the stack table. 
