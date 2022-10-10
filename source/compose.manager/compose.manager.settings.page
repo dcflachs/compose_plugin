@@ -57,6 +57,16 @@ _(Patch unRAID WebUI)_:
   When set to <strong>no</strong> the patches can be removed with the <strong>Unpatch</strong> button or by reboot.<br>
 </blockquote>
 
+_(Debug Logging)_:
+: <select name="DEBUG_TO_LOG">
+  <?=mk_option($cfg['DEBUG_TO_LOG'], "false", _("Disabled"))?>
+  <?=mk_option($cfg['DEBUG_TO_LOG'], "true", _("Enabled"))?>
+  </select>
+
+<blockquote class="inline_help" style="display: none;">
+  Enable debug logging.
+</blockquote>
+
 <input type="submit" name="#default" value="_(Default)_">
 : <input type="submit" name="#apply" value="_(Apply)_" disabled><input type="button" value="_(Done)_" onclick="done()">
 </form>

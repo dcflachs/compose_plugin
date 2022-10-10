@@ -9,16 +9,20 @@ function logger($string) {
 	exec("logger ".$string);
 }
 
-function execComposeCommandInTTY($cmd)
+function execComposeCommandInTTY($cmd, $debug)
 {
 	global $socket_name;;
 	$pid = exec("pgrep -a ttyd|awk '/\\/$socket_name\\.sock/{print \$1}'");
-	logger($pid);
+	if ( $debug ) {
+		logger($pid);
+	}
 	if ($pid) exec("kill $pid");
 	@unlink("/var/tmp/$socket_name.sock");
 	$command = "ttyd -R -o -i '/var/tmp/$socket_name.sock' $cmd". " > /dev/null &"; 
 	exec($command);
-	logger($command);
+	if ( $debug ) {
+		logger($command);
+	}
 }
 
 function echoComposeCommand($action)
@@ -26,11 +30,14 @@ function echoComposeCommand($action)
 	global $plugin_root;
 	global $sName;
 	$cfg = parse_plugin_cfg($sName);
+	$debug = $cfg['DEBUG_TO_LOG'] == "true";
 	$path = isset($_POST['path']) ? urldecode(($_POST['path'])) : "";
 	$unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
 	if ($unRaidVars['mdState'] != "STARTED" ) {
 		echo $plugin_root."/scripts/arrayNotStarted.sh";
-		logger("Array not Started!");
+		if ( $debug ) {
+			logger("Array not Started!");
+		}
 	}
 	else
 	{
@@ -62,13 +69,19 @@ function echoComposeCommand($action)
 			$composeCommand[] = $composeOverride;
 		}
 
+		if( $debug ) {
+			$composeCommand[] = "--debug";
+		}
+
 		if ($cfg['OUTPUTSTYLE'] == "ttyd") {
 			$composeCommand = array_map(function($item) {
 				return escapeshellarg($item);
 			}, $composeCommand);
 			$composeCommand = join(" ", $composeCommand);
-			execComposeCommandInTTY($composeCommand);
-			logger($composeCommand);
+			execComposeCommandInTTY($composeCommand, $debug);
+			if ( $debug ) {
+				logger($composeCommand);
+			}
 			$composeCommand = "/plugins/compose.manager/php/show_ttyd.php";
 		}
 		else {
@@ -85,7 +98,9 @@ function echoComposeCommand($action)
 		}
 		
 		echo $composeCommand;
-		logger($composeCommand);
+		if ( $debug ) {
+			logger($composeCommand);
+		}
 	}	
 }
 

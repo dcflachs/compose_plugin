@@ -2,13 +2,14 @@
 export HOME=/root
 
 SHORT=c:,f:,p:,d:,o:
-LONG=command:,file:,project_name:,project_dir:,override:
+LONG=command:,file:,project_name:,project_dir:,override:,debug
 OPTS=$(getopt -a -n compose --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
 
 files=""
 project_dir=""
+debug=false
 
 while :
 do
@@ -33,6 +34,10 @@ do
       fi
       shift 2
       ;;
+    --debug )
+      debug=true
+      shift;
+      ;;
     --)
       shift;
       break
@@ -46,26 +51,46 @@ done
 case $command in
 
   up)
+    if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" up -d"
+    fi
     eval docker compose $files -p "$name" up -d 2>&1
     ;;
 
   down)
+    if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" down"
+    fi
     eval docker compose $files -p "$name" down  2>&1
     ;;
 
   update)
-    eval docker compose $files -p "$name" up -d --pull always --build 2>&1
+    if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" pull"
+      logger "docker compose $files -p "$name" up -d --build"
+    fi 
+    eval docker compose $files -p "$name" pull 2>&1
+    eval docker compose $files -p "$name" up -d --build 2>&1
     ;;
 
   stop)
+    if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" stop"
+    fi
     eval docker compose $files -p "$name" stop  2>&1
     ;;
 
   list) 
+    if [ "$debug" = true ]; then
+      logger "docker compose ls -a --format json"
+    fi
     eval docker compose ls -a --format json 2>&1
     ;;
 
   logs)
+    if [ "$debug" = true ]; then
+      logger "docker compose $files logs -f"
+    fi
     eval docker compose $files logs -f 2>&1
     ;;
 
