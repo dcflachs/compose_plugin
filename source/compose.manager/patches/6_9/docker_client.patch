@@ -69,12 +69,12 @@
 > 			}
 > 		}
 > 
-> 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
-> 		foreach (glob($icon_glob) as $filename) {
-> 			if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
-> 				@unlink($filename);
-> 			}
-> 		}	
+> 		// $icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
+> 		// foreach (glob($icon_glob) as $filename) {
+> 		// 	if ( ($keepIcon === '') || !(strpos($filename, $keepIcon) !== false) ) {
+> 		// 		@unlink($filename);
+> 		// 	}
+> 		// }	
 > 
 > 		$icon_glob = sprintf('%s/%s*.png', $dockerManPaths['images'], $contName);
 > 		foreach ($ramFiles as $ramFile) {
