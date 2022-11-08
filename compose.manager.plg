@@ -122,22 +122,25 @@ fi
 <FILE Run="/bin/bash">
 <INLINE>
 patch_script=/usr/local/emhttp/plugins/compose.manager/scripts/patch_ui.sh
+config_file=/boot/config/plugins/compose.manager/compose.manager.cfg
 if [ -f "$patch_script" ]; then
-    #Grab the contents of our config file.
-    source &lt;(grep = /boot/config/plugins/compose.manager/compose.manager.cfg)
-    patch_ui=${PATCH_UI:='false'}
+    if [ -f "$config_file" ]; then
+        #Grab the contents of our config file.
+        source &lt;(grep = $config_file)
+        patch_ui=${PATCH_UI:='false'}
 
-    if [ $patch_ui == 'true' ]; then
-        echo ""
-        echo "----------------------------------------------------"
-        echo " Applying WebUI Patches..."
-        echo "----------------------------------------------------"
-        echo ""
-        #Remove patchs if already applied
-        $patch_script -r
+        if [ $patch_ui == 'true' ]; then
+            echo ""
+            echo "----------------------------------------------------"
+            echo " Applying WebUI Patches..."
+            echo "----------------------------------------------------"
+            echo ""
+            #Remove patchs if already applied
+            $patch_script -r
 
-        #Apply Patches
-        $patch_script
+            #Apply Patches
+            $patch_script
+        fi
     fi
 fi
 </INLINE>
