@@ -3,6 +3,14 @@
 COMPOSE_ROOT=/boot/config/plugins/compose.manager/projects
 COMPOSE_WRAPPER=/usr/local/emhttp/plugins/compose.manager/scripts/compose.sh
 
+sanitize() {
+   local s="${1?need a string}"
+   s="${s// /_}"
+   s="${s/./_}"
+   s="${s/-/_}"
+   echo "${s,,}" # convert to lowercase
+}
+
 for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
         if [ -f "$dir/docker-compose.yml" ] || [ -f "$dir/indirect" ]; then
@@ -11,19 +19,20 @@ for dir in $COMPOSE_ROOT/*; do
                 if [ 'true' == "$(< "${autostart}" )" ]; then
                     name=${dir}/name
                     name=$(< "${name}")
+                    name=$(sanitize ${name})
                     override=""
                     if [ -f "$dir/docker-compose.override.yml" ]; then
                         override="$dir/docker-compose.override.yml"
                         override="-f ${override@Q}"
                     fi
-                    logger "Starting compose stack: ${name// /_}"
+                    logger "Starting compose stack: ${name}"
                     if [ -f "$dir/indirect" ]; then
                         indirect=${dir}/indirect
                         indirect=$(< "${indirect}")
-                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name// /_} $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name} $override > /dev/null &
                     else
                         dir="$dir/docker-compose.yml"
-                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name// /_} $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name} $override > /dev/null &
                     fi
                 fi
             fi
