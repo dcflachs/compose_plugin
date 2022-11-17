@@ -63,14 +63,50 @@ case $command in
     fi
     eval docker compose $files -p "$name" down  2>&1
     ;;
-
+    
   update)
     if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" images -q"
       logger "docker compose $files -p "$name" pull"
       logger "docker compose $files -p "$name" up -d --build"
-    fi 
+    fi
+
+    images=()
+    images+=( $(docker compose $files -p "$name" images -q) )
+
+    if [ ${#images[@]} -eq 0 ]; then   
+      delete="-f"
+      files_arr=( $files ) 
+      files_arr=( ${files_arr[@]/$delete} )
+      if (( ${#files_arr[@]} )); then
+        services=( $(cat ${files_arr[*]//\'/} | sed -n 's/image:\(.*\)/\1/p') )
+
+        for image in "${services[@]}"; do
+          images+=( $(docker images -q --no-trunc ${image}) )
+        done
+      fi
+
+      images=( ${images[*]##sha256:} )
+    fi
+    
     eval docker compose $files -p "$name" pull 2>&1
     eval docker compose $files -p "$name" up -d --build 2>&1
+
+    new_images=( $(docker compose $files -p "$name" images -q) )
+    for target in "${new_images[@]}"; do
+      for i in "${!images[@]}"; do
+        if [[ ${images[i]} = $target ]]; then
+          unset 'images[i]'
+        fi
+      done
+    done
+
+    if (( ${#images[@]} )); then
+      if [ "$debug" = true ]; then
+        logger "docker rmi ${images[*]}"
+      fi
+      eval docker rmi ${images[*]}
+    fi
     ;;
 
   stop)
