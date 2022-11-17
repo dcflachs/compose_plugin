@@ -28,6 +28,7 @@ foreach ($composeProjects as $script) {
   $isrunning = FALSE;
   $isexited = FALSE;
   $ispaused = FALSE;
+  $isrestarting = FALSE;
   $isup = FALSE; 
   foreach ( $stackstate as $entry )
   {
@@ -43,6 +44,10 @@ foreach ($composeProjects as $script) {
 
       if ( strpos($entry["Status"], 'paused') !== false ) {
         $ispaused = TRUE;
+      }
+
+      if ( strpos($entry["Status"], 'restarting') !== false ) {
+        $isrestarting = TRUE;
       }
     }
   }
@@ -70,10 +75,10 @@ foreach ($composeProjects as $script) {
         $o .= "<i class='fa fa-square stopped red-text' style='margin-left: 5px;'></i>";
     }
     else {
-      if ( $isrunning && !$isexited && !$ispaused) {
+      if ( $isrunning && !$isexited && !$ispaused && !$isrestarting) {
         $o .= "<i class='fa fa-play started green-text' style='margin-left: 5px;'></i>";
       }
-      elseif( $ispaused && !$isexited && !$isrunning )
+      elseif( $ispaused && !$isexited && !$isrunning && !$isrestarting)
       {
         $o .= "<i class='fa fa-pause started orange-text' style='margin-left: 5px;'></i>";
       }
