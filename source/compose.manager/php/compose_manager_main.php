@@ -627,7 +627,7 @@ function ComposeLogs(myID) {
 </HEAD>
 <BODY>
 
-<div class='editing' hidden>
+<div class='editing' style="margin-bottom:34px;" hidden>
 <!-- <center><b>Editing <?=$compose_root?>/<span id='editStackName'></span>/<span id='editStackFileName'></span></b><br> -->
 <center><b>Editing <span id='editorFileName' data-stackname="" data-stackfilename=""></span></b><br>
 <input type='button' value='Cancel' onclick='cancelEdit();'><input type='button' onclick='saveEdit();' value='Save Changes'><br>
