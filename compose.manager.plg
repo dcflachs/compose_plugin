@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2022.11.17">
+<!ENTITY version     "2023.04.27">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "8e42ac33764c17835f2f48a7bb1fdc24">
+<!ENTITY packageMD5  "44cd23cc5300d8cc7d14cef33b87a77f">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,9 @@
 >
 
 <CHANGES>
+###2023.04.27 
+- Docker Compose v2.17.3
+- PHP8 updates.
 ###2022.11.17
 - Update Stack function will now remove orphaned images.
 - Fix styling in Black and White themes to better match dockerman gui. (Thanks to enkows)
