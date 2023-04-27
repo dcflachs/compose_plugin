@@ -10,7 +10,18 @@ require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 $cfg = parse_plugin_cfg($sName);
 $ui_patch_button_type = (strcmp($cfg['PATCH_UI'],"true") == 0 && !isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
 $ui_unpatch_button_type = (strcmp($cfg['PATCH_UI'],"false") == 0 && isset($composemanDockerClientPatch)) ? "Button" : "Hidden";
+
+$option_patch_ui = version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-RC0', '>=');
+$ui_patch_help_class = $option_patch_ui ? "hidden" : "inline_help";
 ?>
+<style>
+  <?php
+      if ($option_patch_ui)
+      {
+        echo "dl:nth-last-of-type(2){display:none;}";
+      }
+  ?>
+</style>
 <script>
 var caURL = "/plugins/compose.manager/php/exec.php";
 
@@ -42,6 +53,16 @@ _(Compose Command Progress Display)_:
   When set to <strong>ttyd</strong> the output will be a terminal window with colored text.
 </blockquote>
 
+_(Debug Logging)_:
+: <select name="DEBUG_TO_LOG">
+  <?=mk_option($cfg['DEBUG_TO_LOG'], "false", _("Disabled"))?>
+  <?=mk_option($cfg['DEBUG_TO_LOG'], "true", _("Enabled"))?>
+  </select>
+
+<blockquote class="inline_help" style="display: none;">
+  Enable debug logging.
+</blockquote>
+
 _(Patch unRAID WebUI)_:
 : <select name="PATCH_UI">
   <?=mk_option($cfg['PATCH_UI'], "false", _("No"))?>
@@ -51,20 +72,10 @@ _(Patch unRAID WebUI)_:
   <input type=<?=$ui_patch_button_type?> value="_(Patch)_" onclick="patchWebui()">
   <input type=<?=$ui_unpatch_button_type?> value="_(Unpatch)_" onclick="unpatchWebui()">
 
-<blockquote class="inline_help" style="display: none;">
+<blockquote class=<?=$ui_patch_help_class?> style="display: none;">
   Apply patches to the webui to improve the integration of containers started by compose.manager.<br>
   When set to <strong>yes</strong> the patches can be activated with the <strong>Patch</strong> button or by reboot.<br>
   When set to <strong>no</strong> the patches can be removed with the <strong>Unpatch</strong> button or by reboot.<br>
-</blockquote>
-
-_(Debug Logging)_:
-: <select name="DEBUG_TO_LOG">
-  <?=mk_option($cfg['DEBUG_TO_LOG'], "false", _("Disabled"))?>
-  <?=mk_option($cfg['DEBUG_TO_LOG'], "true", _("Enabled"))?>
-  </select>
-
-<blockquote class="inline_help" style="display: none;">
-  Enable debug logging.
 </blockquote>
 
 <input type="submit" name="#default" value="_(Default)_">

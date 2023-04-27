@@ -12,6 +12,7 @@ $composeProjects = @array_diff(@scandir($compose_root),array(".",".."));
 if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
 }
+$o = "";
 foreach ($composeProjects as $script) {
   if ( ( ! is_file("$compose_root/$script/docker-compose.yml") ) &&
        ( ! is_file("$compose_root/$script/indirect") ) ) {
@@ -57,7 +58,7 @@ foreach ($composeProjects as $script) {
     $description = str_replace("\r","",$description);
     $description = str_replace("\n","<br>",$description);
   } else {
-    $description = $variables['description'] ? $variables['description'] : "No description<br>($compose_root/$script)";
+    $description = isset($variables['description']) ? $variables['description'] : "No description<br>($compose_root/$script)";
   }
 
   $autostart = '';

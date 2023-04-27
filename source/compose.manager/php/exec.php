@@ -33,6 +33,7 @@ switch ($_POST['action']) {
         $folderName = str_replace("(","",$folderName);
         $folderName = str_replace(")","",$folderName);
         $folderName = preg_replace("/ {2,}/", " ", $folderName);
+        $folderName = preg_replace("/\s/", "_", $folderName);
         $folder = "$compose_root/$folderName";
         while ( true ) {
           if ( is_dir($folder) ) {

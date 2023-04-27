@@ -54,6 +54,7 @@ function echoComposeCommand($action)
 		$composeCommand[] = $action;
 		$composeCommand[] = $projectName;
 
+		$composeFile = "";
 		if( isIndirect($path) ) {
 			$composeFile = getPath($path);
 			$composeFile = "-d$composeFile";
