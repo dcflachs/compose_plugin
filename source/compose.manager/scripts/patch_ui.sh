@@ -37,7 +37,7 @@ elif [ ! -z $(grep -Po "6.9.2" /etc/unraid-version ) ]; then
 elif [ ! -z $(grep -Po "6.11.\d+" /etc/unraid-version ) ]; then
   patch_folder="$patch_folder/6_11"
 else
-  exit 2
+  exit 0
 fi
 
 docker_client_path="/usr/local/emhttp/plugins/dynamix.docker.manager/include"
