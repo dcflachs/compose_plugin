@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2023.05.24">
+<!ENTITY version     "2023.09.04">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
 <!ENTITY packageMD5  "dab785bd5ce408be3356ae02c3336260">
@@ -25,6 +25,8 @@
 >
 
 <CHANGES>
+###2023.09.04 
+- Docker Compose v2.21.0
 ###2023.05.24 
 - Fix to patch_ui.sh for 6.12
 ###2023.04.27 
