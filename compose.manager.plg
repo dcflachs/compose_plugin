@@ -5,7 +5,7 @@
 <!ENTITY version     "2023.09.04">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "dab785bd5ce408be3356ae02c3336260">
+<!ENTITY packageMD5  "e94a9d5c6ea5040f9c3a35b18c5bc2a7">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
