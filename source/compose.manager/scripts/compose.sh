@@ -54,6 +54,13 @@ case $command in
     if [ "$debug" = true ]; then
       logger "docker compose $files -p "$name" up -d"
     fi
+    eval docker compose $files -p "$name" up -d 2>&1
+    ;;
+
+  autostart)
+    if [ "$debug" = true ]; then
+      logger "docker compose $files -p "$name" up --force-recreate -d"
+    fi
     eval docker compose $files -p "$name" up --force-recreate -d 2>&1
     ;;
 
