@@ -1,6 +1,9 @@
 #!/bin/bash
 
-COMPOSE_ROOT=/boot/config/plugins/compose.manager/projects
+source /usr/local/emhttp/plugins/compose.manager/default.cfg
+source /boot/config/plugins/compose.manager/compose.manager.cfg
+
+COMPOSE_ROOT=$PROJECTS_FOLDER
 COMPOSE_WRAPPER=/usr/local/emhttp/plugins/compose.manager/scripts/compose.sh
 
 for dir in $COMPOSE_ROOT/*; do
