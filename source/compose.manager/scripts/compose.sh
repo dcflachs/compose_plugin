@@ -2,13 +2,14 @@
 export HOME=/root
 
 SHORT=c:,f:,p:,d:,o:
-LONG=command:,file:,project_name:,project_dir:,override:,debug
+LONG=command:,file:,project_name:,project_dir:,override:,debug,recreate
 OPTS=$(getopt -a -n compose --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
 
 files=""
 project_dir=""
+other_options=""
 debug=false
 
 while :
@@ -34,6 +35,10 @@ do
       fi
       shift 2
       ;;
+    --recreate )
+      other_options="--force-recreate"
+      shift;
+      ;;
     --debug )
       debug=true
       shift;
@@ -52,9 +57,9 @@ case $command in
 
   up)
     if [ "$debug" = true ]; then
-      logger "docker compose $files -p "$name" up -d"
+      logger "docker compose $files -p "$name" up $other_options -d"
     fi
-    eval docker compose $files -p "$name" up -d 2>&1
+    eval docker compose $files -p "$name" up $other_options -d 2>&1
     ;;
 
   down)

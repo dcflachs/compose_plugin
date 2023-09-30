@@ -14,6 +14,16 @@ sanitize() {
    echo "${s,,}" # convert to lowercase
 }
 
+recreate=""
+if [ "$AUTOSTART_FORCE_RECREATE" = "true" ]; then
+    recreate="--recreate"
+fi
+
+debug=""
+if [ "$DEBUG_TO_LOG" = "true" ]; then
+    debug="--debug"
+fi
+
 for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
         if [ -f "$dir/docker-compose.yml" ] || [ -f "$dir/indirect" ]; then
@@ -32,10 +42,10 @@ for dir in $COMPOSE_ROOT/*; do
                     if [ -f "$dir/indirect" ]; then
                         indirect=${dir}/indirect
                         indirect=$(< "${indirect}")
-                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name} $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name} $recreate $debug $override > /dev/null &
                     else
                         dir="$dir/docker-compose.yml"
-                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name} $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name} $recreate $debug $override > /dev/null &
                     fi
                 fi
             fi

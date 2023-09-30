@@ -63,6 +63,19 @@ _(Debug Logging)_:
   Enable debug logging.
 </blockquote>
 
+_(Recreate During Autostart)_:
+: <select name="AUTOSTART_FORCE_RECREATE">
+  <?=mk_option($cfg['AUTOSTART_FORCE_RECREATE'], "false", _("Disabled"))?>
+  <?=mk_option($cfg['AUTOSTART_FORCE_RECREATE'], "true", _("Enabled"))?>
+  </select>
+
+<blockquote class="inline_help" style="display: none;">
+  Use the --force-recreate option when autostarting stacks.<br> 
+  This will recreate each stack container on startup.<br>
+  This can work around an issue where containers refuse to autostart because the 
+  network they are attached to no longer exists.
+</blockquote>
+
 _(Patch unRAID WebUI)_:
 : <select name="PATCH_UI">
   <?=mk_option($cfg['PATCH_UI'], "false", _("No"))?>
