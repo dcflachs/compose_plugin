@@ -496,6 +496,7 @@ function editComposeFile(myID) {
       var editor = ace.edit("itemEditor");
       editor.getSession().setValue(response.content);
       editor.getSession().setMode("ace/mode/yaml");
+      editor.getSession().setOptions({ tabSize: 2, useSoftTabs: true });
 
       $('#editorFileName').data("stackname", script);
       $('#editorFileName').data("stackfilename", "docker-compose.yml")
@@ -515,7 +516,7 @@ function editEnv(myID) {
       var response = jQuery.parseJSON(data);
       var editor = ace.edit("itemEditor");
       editor.getSession().setValue(response.content);
-      editor.getSession().setMode("ace/mode/text");
+      editor.getSession().setMode("ace/mode/sh");
 
       $('#editorFileName').data("stackname", script);
       $('#editorFileName').data("stackfilename", ".env")
