@@ -38,14 +38,20 @@ for dir in $COMPOSE_ROOT/*; do
                         override="$dir/docker-compose.override.yml"
                         override="-f ${override@Q}"
                     fi
+                    envpath=""
+                    if [ -f "$dir/envpath" ]; then
+                        envpath="$dir/envpath"
+                        envpath="$(< "${envpath}" )"
+                        envpath="-e ${envpath@Q}"
+                    fi
                     logger "Starting compose stack: ${name}"
                     if [ -f "$dir/indirect" ]; then
                         indirect=${dir}/indirect
                         indirect=$(< "${indirect}")
-                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name} $recreate $debug $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -d ${indirect@Q} -p ${name} $recreate $debug $override $envpath > /dev/null &
                     else
                         dir="$dir/docker-compose.yml"
-                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name} $recreate $debug $override > /dev/null &
+                        eval $COMPOSE_WRAPPER -c up -f ${dir@Q} -p ${name} $recreate $debug $override $envpath > /dev/null &
                     fi
                 fi
             fi
