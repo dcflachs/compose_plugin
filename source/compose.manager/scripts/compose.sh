@@ -7,7 +7,7 @@ OPTS=$(getopt -a -n compose --options $SHORT --longoptions $LONG -- "$@")
 
 eval set -- "$OPTS"
 
-envToUse=""
+envFile=""
 files=""
 project_dir=""
 other_options=""
@@ -17,17 +17,17 @@ while :
 do
   case "$1" in
     -e | --env )
-      envToUse="$2"
+      envFile="$2"
       shift 2
       
-      if [ -f $envToUse ]; then
-        echo "using .env: $envToUse"
+      if [ -f $envFile ]; then
+        echo "using .env: $envFile"
       else
-        echo ".env doesn't exist: $envToUse"
+        echo ".env doesn't exist: $envFile"
         exit
       fi
 
-      envToUse="--env-file $envToUse"
+      envFile="--env-file $envFile"
       ;;
     -c | --command )
       command="$2"
@@ -71,27 +71,27 @@ case $command in
 
   up)
     if [ "$debug" = true ]; then
-      logger "docker compose $envToUse $files -p "$name" up $other_options -d"
+      logger "docker compose $envFile $files -p "$name" up $other_options -d"
     fi
-    eval docker compose $envToUse $files -p "$name" up $other_options -d 2>&1
+    eval docker compose $envFile $files -p "$name" up $other_options -d 2>&1
     ;;
 
   down)
     if [ "$debug" = true ]; then
-      logger "docker compose $envToUse $files -p "$name" down"
+      logger "docker compose $envFile $files -p "$name" down"
     fi
-    eval docker compose $envToUse $files -p "$name" down  2>&1
+    eval docker compose $envFile $files -p "$name" down  2>&1
     ;;
     
   update)
     if [ "$debug" = true ]; then
-      logger "docker compose $envToUse $files -p "$name" images -q"
-      logger "docker compose $envToUse $files -p "$name" pull"
-      logger "docker compose $envToUse $files -p "$name" up -d --build"
+      logger "docker compose $envFile $files -p "$name" images -q"
+      logger "docker compose $envFile $files -p "$name" pull"
+      logger "docker compose $envFile $files -p "$name" up -d --build"
     fi
 
     images=()
-    images+=( $(docker compose $envToUse $files -p "$name" images -q) )
+    images+=( $(docker compose $envFile $files -p "$name" images -q) )
 
     if [ ${#images[@]} -eq 0 ]; then   
       delete="-f"
@@ -108,11 +108,11 @@ case $command in
       images=( ${images[*]##sha256:} )
     fi
     
-    eval docker compose $envToUse $files -p "$name" pull 2>&1
-    eval docker compose $envToUse $files -p "$name" up -d --build 2>&1
-    # eval docker compose $envToUse $files -p "$name" up -d --build 2>&1
+    eval docker compose $envFile $files -p "$name" pull 2>&1
+    eval docker compose $envFile $files -p "$name" up -d --build 2>&1
+    # eval docker compose $envFile $files -p "$name" up -d --build 2>&1
 
-    new_images=( $(docker compose $envToUse $files -p "$name" images -q) )
+    new_images=( $(docker compose $envFile $files -p "$name" images -q) )
     for target in "${new_images[@]}"; do
       for i in "${!images[@]}"; do
         if [[ ${images[i]} = $target ]]; then
@@ -131,9 +131,9 @@ case $command in
 
   stop)
     if [ "$debug" = true ]; then
-      logger "docker compose $envToUse $files -p "$name" stop"
+      logger "docker compose $envFile $files -p "$name" stop"
     fi
-    eval docker compose $envToUse $files -p "$name" stop  2>&1
+    eval docker compose $envFile $files -p "$name" stop  2>&1
     ;;
 
   list) 
@@ -145,9 +145,9 @@ case $command in
 
   logs)
     if [ "$debug" = true ]; then
-      logger "docker compose $envToUse $files logs -f"
+      logger "docker compose $envFile $files logs -f"
     fi
-    eval docker compose $envToUse $files logs -f 2>&1
+    eval docker compose $envFile $files logs -f 2>&1
     ;;
 
   *)

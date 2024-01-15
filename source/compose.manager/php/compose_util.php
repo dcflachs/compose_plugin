@@ -70,9 +70,9 @@ function echoComposeCommand($action)
 			$composeCommand[] = $composeOverride;
 		}
 
-		if ( is_file("$path/envToUse") ) {
-			$envToUse = "-e" . trim(file_get_contents("$path/envToUse"));
-			$composeCommand[] = $envToUse;
+		if ( is_file("$path/envPath") ) {
+			$envPath = "-e" . trim(file_get_contents("$path/envPath"));
+			$composeCommand[] = $envPath;
 		}
 
 		if( $debug ) {
