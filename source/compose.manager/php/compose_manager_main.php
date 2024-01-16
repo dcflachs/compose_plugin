@@ -153,7 +153,14 @@ $(function() {
       var disabled = $("#"+myID).attr('data-isup') == "1" ? "disabled" : "";
       var notdisabled = $("#"+myID).attr('data-isup') == "1" ? "" : "disabled";
 			var stackName = $("#"+myID).attr("data-scriptname");
-      instance.content(stackName + "<br><center><input type='button' value='Edit Name' onclick='editName(&quot;"+myID+"&quot;);' "+disabled+"><input type='button' value='Edit Description' onclick='editDesc(&quot;"+myID+"&quot;);'><input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'><input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"><input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"></center>");
+      instance.content(stackName + "<br> \
+                                    <center> \
+                                    <input type='button' onclick='editName(&quot;"+myID+"&quot;);' value='Edit Name' "+disabled+"> \
+                                    <input type='button' onclick='editDesc(&quot;"+myID+"&quot;);' value='Edit Description' > \
+                                    <input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'> \
+                                    <input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"> \
+                                    <input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"> \
+                                    </center>");
 		}
 	});
   $('.auto_start').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
@@ -325,6 +332,7 @@ function editStack(myID) {
   buttonsList["compose_file"] = { text: "Compose File" };
   buttonsList["env_file"] = { text: "ENV File" };
   buttonsList["override_file"] = { text: "UI Labels" };
+  buttonsList["stack_settings"] = { text: "Stack Settings" };
 
   buttonsList["Cancel"] = { text: "Cancel", value: null, };
   swal2({
@@ -342,6 +350,9 @@ function editStack(myID) {
           break;
         case 'override_file':
           generateOverride(myID);
+          break;
+        case 'stack_settings':
+          editStackSettings(myID);
           break;
         default:
           return;
@@ -561,6 +572,53 @@ function saveEdit() {
     }
   });
 
+}
+
+function editStackSettings(myID) {
+  var script = $("#"+myID).attr("data-scriptname");
+
+  $.post(caURL,{action:'getEnvPath',script:script},function(rawEnvPath) {
+    if (rawEnvPath) {
+      var rawEnvPath = jQuery.parseJSON(rawEnvPath);
+      if(rawEnvPath.result == 'success') {
+        var form = document.createElement("div");
+        // form.classList.add("swal-content");
+        form.innerHTML =  `<div class="swal-text" style="font-weight: bold; padding-left: 0px; margin-top: 0px;">ENV File Path</div>`;
+        form.innerHTML += `<br>`;
+        form.innerHTML += `<input type='text' id='env_path' class='swal-content__input' pattern="(\/mnt\/.*\/.+)" oninput="this.reportValidity()" title="A path under /mnt/user/ or /mnt/cache/ or /mnt/pool/" placeholder=Default value='${rawEnvPath.content}'>`;
+        swal2({
+          title: "Stack Settings",
+          // text: "Enter in the name for the stack",
+          content: form,
+          buttons: true,
+        }).then((inputValue) => {
+          if (inputValue) {
+            var new_env_path = document.getElementById("env_path").value;
+            $.post(caURL,{action:'setEnvPath',envPath:new_env_path,script:script},function(data) {
+                var title = "Failed to set stack settings.";
+                var message = "";
+                var icon = "error";
+                if (data) {
+                  var response = jQuery.parseJSON(data);
+                  if (response.result == "success") {
+                    title = "Success";
+                  }
+                  message = response.message;
+                  icon = response.result;
+                }
+                swal2({
+                  title: title,
+                  text: message,
+                  icon: icon,
+                }).then(() => {
+                  location.reload();
+                });
+            });        
+          }
+        });
+      }
+    }
+  });
 }
 
 function ComposeUp(path) {

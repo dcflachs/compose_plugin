@@ -104,14 +104,18 @@ switch ($_POST['action']) {
     case 'getEnv':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $basePath = getPath("$compose_root/$script");
-        $fileName = ".env";
+        $fileName = "$basePath/.env";
+        if ( is_file("$basePath/envpath") ) {
+            $fileName = file_get_contents("$basePath/envpath");
+            $fileName = str_replace("\r","",$fileName);
+        }
 
-        $scriptContents = is_file("$basePath/$fileName") ? file_get_contents("$basePath/$fileName") : "";
+        $scriptContents = is_file("$fileName") ? file_get_contents("$fileName") : "";
         $scriptContents = str_replace("\r","",$scriptContents);
         if ( ! $scriptContents ) {
             $scriptContents = "\n";
         }
-        echo json_encode( [ 'result' => 'success', 'fileName' => "$basePath/$fileName", 'content' => $scriptContents ] );
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$fileName", 'content' => $scriptContents ] );
         break;
     case 'getOverride':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
@@ -138,10 +142,14 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
-        $fileName = ".env";
+        $fileName = "$basePath/.env";
+        if ( is_file("$basePath/envpath") ) {
+            $fileName = file_get_contents("$basePath/envpath");
+            $fileName = str_replace("\r","",$fileName);
+        }
 
-        file_put_contents("$basePath/$fileName",$scriptContents);
-        echo "$basePath/$fileName saved";
+        file_put_contents("$fileName",$scriptContents);
+        echo "$fileName saved";
         break;
     case 'saveOverride':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
@@ -172,6 +180,37 @@ switch ($_POST['action']) {
     case 'unPatchUI':
         exec("$plugin_root/scripts/patch_ui.sh -r");
         break;
+    case 'setEnvPath':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        if ( ! $script ) {
+            echo json_encode( [ 'result' => 'error', 'message' => 'Stack not specified.' ] );
+            break;
+        }
+        $fileContent = isset($_POST['envPath']) ? urldecode(($_POST['envPath'])) : "";
+        $fileName = "$compose_root/$script/envpath";
+        if ( is_file($fileName) ) {
+            exec("rm ".escapeshellarg($fileName));
+        }
+        if ( isset($fileContent) && !empty($fileContent) ) {
+            file_put_contents($fileName,$fileContent);
+        }
+        echo json_encode( [ 'result' => 'success', 'message' => '' ] );
+        break;
+    case 'getEnvPath':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        if ( ! $script ) {
+            echo json_encode( [ 'result' => 'error', 'message' => 'Stack not specified.' ] );
+            break;
+        }
+        $fileName = "$compose_root/$script/envpath";
+        $fileContents = is_file("$fileName") ? file_get_contents("$fileName") : "";
+        $fileContents = str_replace("\r","",$fileContents);
+        if ( ! $fileContents ) {
+            $fileContents = "";
+        }
+        echo json_encode( [ 'result' => 'success', 'fileName' => "$fileName", 'content' => $fileContents ] );
+        break;
+
 }
 
 ?>
