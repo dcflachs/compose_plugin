@@ -13,17 +13,17 @@ if ( ! is_array($composeProjects) ) {
   $composeProjects = array();
 }
 $o = "";
-foreach ($composeProjects as $script) {
-  if ( ( ! is_file("$compose_root/$script/docker-compose.yml") ) &&
-       ( ! is_file("$compose_root/$script/indirect") ) ) {
+foreach ($composeProjects as $project) {
+  if ( ( ! is_file("$compose_root/$project/docker-compose.yml") ) &&
+       ( ! is_file("$compose_root/$project/indirect") ) ) {
     continue;
   }
 
-  $scriptName = $script;
-  if ( is_file("$compose_root/$script/name") ) {
-    $scriptName = trim(file_get_contents("$compose_root/$script/name"));
+  $projectName = $project;
+  if ( is_file("$compose_root/$project/name") ) {
+    $projectName = trim(file_get_contents("$compose_root/$project/name"));
   }
-  $id = str_replace(".","-",$script);
+  $id = str_replace(".","-",$project);
   $id = str_replace(" ","",$id);
 
   $isrunning = FALSE;
@@ -33,7 +33,7 @@ foreach ($composeProjects as $script) {
   $isup = FALSE; 
   foreach ( $stackstate as $entry )
   {
-    if ( strcasecmp($entry["Name"], sanitizeStr($scriptName)) == 0 ) {
+    if ( strcasecmp($entry["Name"], sanitizeStr($projectName)) == 0 ) {
       $isup = TRUE; 
       if ( strpos($entry["Status"], 'running') !== false ) {
         $isrunning = TRUE;
@@ -53,24 +53,24 @@ foreach ($composeProjects as $script) {
     }
   }
 
-  if ( is_file("$compose_root/$script/description") ) {
-    $description = @file_get_contents("$compose_root/$script/description");
+  if ( is_file("$compose_root/$project/description") ) {
+    $description = @file_get_contents("$compose_root/$project/description");
     $description = str_replace("\r","",$description);
     $description = str_replace("\n","<br>",$description);
   } else {
-    $description = isset($variables['description']) ? $variables['description'] : "No description<br>($compose_root/$script)";
+    $description = isset($variables['description']) ? $variables['description'] : "No description<br>($compose_root/$project)";
   }
 
   $autostart = '';
-  if ( is_file("$compose_root/$script/autostart") ) {
-    $autostarttext = @file_get_contents("$compose_root/$script/autostart");
+  if ( is_file("$compose_root/$project/autostart") ) {
+    $autostarttext = @file_get_contents("$compose_root/$project/autostart");
     if ( strpos($autostarttext, 'true') !== false ) {
       $autostart = 'checked';
     }
   }
 
   $o .= "<tr><td width='30%' style='text-align:initial'>";
-  $o .= "<font size='2'><span class='ca_nameEdit' id='name$id' data-nameName='$scriptName' data-isup='$isup' data-scriptName=".escapeshellarg($script)." style='font-size:1.9rem;cursor:pointer;color:#ff8c2f;'><i class='fa fa-gear'></i></span>&nbsp;&nbsp;<b><span style='color:#ff8c2f;'>$scriptName</span>&nbsp;</b></font>";
+  $o .= "<font size='2'><span class='ca_nameEdit' id='name$id' data-nameName='$projectName' data-isup='$isup' data-scriptName=".escapeshellarg($project)." style='font-size:1.9rem;cursor:pointer;color:#ff8c2f;'><i class='fa fa-gear'></i></span>&nbsp;&nbsp;<b><span style='color:#ff8c2f;'>$projectName</span>&nbsp;</b></font>";
   if ( $isup ) {
     if (  $isexited && !$isrunning) {
         $o .= "<i class='fa fa-square stopped red-text' style='margin-left: 5px;'></i>";
@@ -94,13 +94,13 @@ foreach ($composeProjects as $script) {
     }
   }
   $o .= "<br>";
-  $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($script)." id='desc$id'>$description</span>";
+  $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($project)." id='desc$id'>$description</span>";
   $o .= "</td>";
   $o .= "<td width=25%></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Down' class='down$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Update Stack' class='update$id' id='$id' onclick='UpdateStack(&quot;$compose_root/$script&quot;);'></td>";
-  $o .= "<td width=5%><input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($script)." id='$id' style='display:none' $autostart></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$project&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Compose Down' class='down$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$project&quot;);'></td>";
+  $o .= "<td width=5%><input type='button' value='Update Stack' class='update$id' id='$id' onclick='UpdateStack(&quot;$compose_root/$project&quot;);'></td>";
+  $o .= "<td width=5%><input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($project)." id='$id' style='display:none' $autostart></td>";
   $o .= "</tr>";
 }
 ?>
@@ -235,9 +235,9 @@ function addStack() {
 
 function deleteStack(myID) {
   var stackName = $("#"+myID).attr("data-scriptname");
-  var script = $("#"+myID).attr("data-namename");
+  var project = $("#"+myID).attr("data-namename");
   var element = document.createElement("div")
-  element.innerHTML = "Are you sure you want to delete <font color='red'><b>"+script+"</b></font> (<font color='green'>"+compose_root+"/"+stackName+"</font>)?"; 
+  element.innerHTML = "Are you sure you want to delete <font color='red'><b>"+project+"</b></font> (<font color='green'>"+compose_root+"/"+stackName+"</font>)?"; 
   swal2({
     content: element,
     title: "Delete Stack?",
@@ -294,11 +294,11 @@ function editDesc(myID) {
 
 function applyName(myID) {
   var newName = $("#newName"+myID).val();
-  var script = $("#"+myID).attr("data-scriptname");
+  var project = $("#"+myID).attr("data-scriptname");
   $("#"+myID).html(newName);
   $("#"+myID).tooltipster("enable");
   $("#"+myID).tooltipster("close");
-  $.post(caURL,{action:'changeName',script:script,newName:newName},function(data) {
+  $.post(caURL,{action:'changeName',script:project,newName:newName},function(data) {
 		window.location.reload();
 	});
 }
@@ -321,9 +321,9 @@ function cancelDesc(myID) {
 function applyDesc(myID) {
   var newDesc = $("#newDesc"+myID).val();
   newDesc = newDesc.replace(/\n/g, "<br>");
-  var script = $("#"+myID).attr("data-scriptname");
+  var project = $("#"+myID).attr("data-scriptname");
   $("#"+myID).html(newDesc);
-  $.post(caURL,{action:'changeDesc',script:script,newDesc:newDesc});
+  $.post(caURL,{action:'changeDesc',script:project,newDesc:newDesc});
 }
 
 function editStack(myID) {
@@ -381,17 +381,17 @@ function override_find_labels( primary, secondary, label ) {
   return value;
 }
 
-function generateOverride(myID, myScript=null) {
-  var script = myScript;
+function generateOverride(myID, myProject=null) {
+  var project = myProject;
   if( myID ) {
     $("#"+myID).tooltipster("close");
-    script = $("#"+myID).attr("data-scriptname");
+    project = $("#"+myID).attr("data-scriptname");
   }
     
-  $.post(caURL,{action:'getOverride',script:script},function(rawOverride) {
+  $.post(caURL,{action:'getOverride',script:project},function(rawOverride) {
     if (rawOverride) {
       var rawOverride = jQuery.parseJSON(rawOverride);
-      $.post(caURL,{action:'getYml',script:script},function(rawComposefile) {
+      $.post(caURL,{action:'getYml',script:project},function(rawComposefile) {
         if (rawComposefile) {
           var rawComposefile = jQuery.parseJSON(rawComposefile);
 
@@ -480,7 +480,7 @@ function generateOverride(myID, myScript=null) {
 
                 rawOverride = jsyaml.dump(override_doc, {'forceQuotes': true});
                 // console.log(rawOverride);
-                $.post(caURL,{action:"saveOverride",script:script,scriptContents:rawOverride},function(data) {
+                $.post(caURL,{action:"saveOverride",script:project,scriptContents:rawOverride},function(data) {
                   if (!data) {
                     swal2({
                       title: "Failed to update labels.",
@@ -500,8 +500,8 @@ function generateOverride(myID, myScript=null) {
 function editComposeFile(myID) {
   var origID = myID;
   $("#"+myID).tooltipster("close");
-  var script = $("#"+myID).attr("data-scriptname");
-  $.post(caURL,{action:'getYml',script:script},function(data) {
+  var project = $("#"+myID).attr("data-scriptname");
+  $.post(caURL,{action:'getYml',script:project},function(data) {
     if (data) {
       var response = jQuery.parseJSON(data);
       var editor = ace.edit("itemEditor");
@@ -509,7 +509,7 @@ function editComposeFile(myID) {
       editor.getSession().setMode("ace/mode/yaml");
       editor.getSession().setOptions({ tabSize: 2, useSoftTabs: true });
 
-      $('#editorFileName').data("stackname", script);
+      $('#editorFileName').data("stackname", project);
       $('#editorFileName').data("stackfilename", "docker-compose.yml")
       $('#editorFileName').html(response.fileName)
       $(".editing").show();
@@ -521,15 +521,15 @@ function editComposeFile(myID) {
 function editEnv(myID) {
   var origID = myID;
   $("#"+myID).tooltipster("close");
-  var script = $("#"+myID).attr("data-scriptname");
-  $.post(caURL,{action:'getEnv',script:script},function(data) {
+  var project = $("#"+myID).attr("data-scriptname");
+  $.post(caURL,{action:'getEnv',script:project},function(data) {
     if (data) {
       var response = jQuery.parseJSON(data);
       var editor = ace.edit("itemEditor");
       editor.getSession().setValue(response.content);
       editor.getSession().setMode("ace/mode/sh");
 
-      $('#editorFileName').data("stackname", script);
+      $('#editorFileName').data("stackname", project);
       $('#editorFileName').data("stackfilename", ".env")
       $('#editorFileName').html(response.fileName)
       $(".editing").show();
@@ -543,7 +543,7 @@ function cancelEdit() {
 }
 
 function saveEdit() {
-  var script = $("#editorFileName").data("stackname");
+  var project = $("#editorFileName").data("stackname");
   var fileName = $("#editorFileName").data("stackfilename");
   var editor = ace.edit("itemEditor");
   var scriptContents = editor.getValue();
@@ -563,11 +563,11 @@ function saveEdit() {
       return;
   }
 
-  $.post(caURL,{action:actionStr,script:script,scriptContents:scriptContents},function(data) {
+  $.post(caURL,{action:actionStr,script:project,scriptContents:scriptContents},function(data) {
     if (data) {
       $(".editing").hide();
       if (actionStr == 'saveYml') {
-        generateOverride(null,script);
+        generateOverride(null,project);
       }
     }
   });
@@ -575,9 +575,9 @@ function saveEdit() {
 }
 
 function editStackSettings(myID) {
-  var script = $("#"+myID).attr("data-scriptname");
+  var project = $("#"+myID).attr("data-scriptname");
 
-  $.post(caURL,{action:'getEnvPath',script:script},function(rawEnvPath) {
+  $.post(caURL,{action:'getEnvPath',script:project},function(rawEnvPath) {
     if (rawEnvPath) {
       var rawEnvPath = jQuery.parseJSON(rawEnvPath);
       if(rawEnvPath.result == 'success') {
@@ -594,7 +594,7 @@ function editStackSettings(myID) {
         }).then((inputValue) => {
           if (inputValue) {
             var new_env_path = document.getElementById("env_path").value;
-            $.post(caURL,{action:'setEnvPath',envPath:new_env_path,script:script},function(data) {
+            $.post(caURL,{action:'setEnvPath',envPath:new_env_path,script:project},function(data) {
                 var title = "Failed to set stack settings.";
                 var message = "";
                 var icon = "error";
@@ -658,8 +658,8 @@ function ComposeLogs(myID) {
   var height = 800;
   var width = 1200;
   $("#"+myID).tooltipster("close");
-  var script = $("#"+myID).attr("data-scriptname");
-  var path = compose_root + "/" + script;
+  var project = $("#"+myID).attr("data-scriptname");
+  var path = compose_root + "/" + project;
   console.log(path);
   $.post(compURL,{action:'composeLogs',path:path},function(data) {
     if (data) {
