@@ -210,7 +210,24 @@ switch ($_POST['action']) {
         }
         echo json_encode( [ 'result' => 'success', 'fileName' => "$fileName", 'content' => $fileContents ] );
         break;
+    case 'saveProfiles':
+        $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
+        $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
+        $basePath = "$compose_root/$script";
+        $fileName = "$basePath/profiles";
 
+        if( $scriptContents == "[]" ) {
+            if ( is_file($fileName) ) {
+                exec("rm ".escapeshellarg($fileName));
+                echo "$fileName deleted";
+            }
+
+            break;
+        }
+
+        file_put_contents("$fileName",$scriptContents);
+        echo "$fileName saved";
+        break;
 }
 
 ?>

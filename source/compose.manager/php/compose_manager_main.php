@@ -3,6 +3,25 @@
 require_once("/usr/local/emhttp/plugins/compose.manager/php/defines.php");
 require_once("/usr/local/emhttp/plugins/compose.manager/php/util.php");
 
+function createComboButton($text, $id, $onClick, $onClickParams, $items) {
+  $o = "";
+
+  $o .= "<div class='combo-btn-group'>";
+  $o .= "<input type='button' value='$text' class='combo-btn-group-left' id='$id-left-btn' onclick='$onClick($onClickParams);'>";
+  $o .= "<section class='combo-btn-subgroup dropdown'>";
+  $o .= "<button type='button' class='dropdown-toggle combo-btn-group-right' data-toggle='dropdown'><i class='fa fa-caret-down'></i></button>";
+  $o .= "<div class='dropdown-content'>";
+  foreach ( $items as $item )
+  {
+    $o .= "<a href='#' onclick='$onClick($onClickParams, &quot;$item&quot;);'>$item</a>";
+  }
+  $o .= "</div>";
+  $o .= "</section>";
+  $o .= "</div>";
+
+  return $o;
+}
+
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 
 $stackstate = shell_exec($plugin_root."/scripts/compose.sh -c list");
@@ -69,6 +88,12 @@ foreach ($composeProjects as $project) {
     }
   }
 
+  $profiles = array();
+  if ( is_file("$compose_root/$project/profiles") ) {
+    $profilestext = @file_get_contents("$compose_root/$project/profiles");
+    $profiles = json_decode($profilestext, false);
+  }
+
   $o .= "<tr><td width='30%' style='text-align:initial'>";
   $o .= "<font size='2'><span class='ca_nameEdit' id='name$id' data-nameName='$projectName' data-isup='$isup' data-scriptName=".escapeshellarg($project)." style='font-size:1.9rem;cursor:pointer;color:#ff8c2f;'><i class='fa fa-gear'></i></span>&nbsp;&nbsp;<b><span style='color:#ff8c2f;'>$projectName</span>&nbsp;</b></font>";
   if ( $isup ) {
@@ -97,10 +122,28 @@ foreach ($composeProjects as $project) {
   $o .= "<span class='ca_descEdit' data-scriptName=".escapeshellarg($project)." id='desc$id'>$description</span>";
   $o .= "</td>";
   $o .= "<td width=25%></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Up'   class='up$id' id='$id' onclick='ComposeUp(&quot;$compose_root/$project&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Compose Down' class='down$id' id='$id' onclick='ComposeDown(&quot;$compose_root/$project&quot;);'></td>";
-  $o .= "<td width=5%><input type='button' value='Update Stack' class='update$id' id='$id' onclick='UpdateStack(&quot;$compose_root/$project&quot;);'></td>";
-  $o .= "<td width=5%><input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($project)." id='$id' style='display:none' $autostart></td>";
+  $buttons = [
+    ["Compose Up", "ComposeUp", "up"], 
+    ["Compose Down", "ComposeDown", "down"], 
+    ["Update Stack", "UpdateStack", "update"]
+  ];
+
+  foreach ($buttons as $button)
+  {
+    $o .= "<td width=5%>";
+    if ( $profiles ) {
+      // $onclick = $button[1];
+      $onClickParams = "&quot;$compose_root/$project&quot;";
+      $o .= createComboButton($button[0], "$button[2]-$id", $button[1], $onClickParams, $profiles);
+    } else {
+      $o .= "<input type='button' value='$button[0]' class='$button[2]-button' id='$button[2]-$id' onclick='$button[1](&quot;$compose_root/$project&quot;);'>";
+    }
+    $o .= "</td>";
+  }
+  
+  $o .= "<td width=5%>";
+  $o .= "<input type='checkbox' class='auto_start' data-scriptName=".escapeshellarg($project)." id='autostart-$id' style='display:none' $autostart>";
+  $o .= "</td>";
   $o .= "</tr>";
 }
 ?>
@@ -115,6 +158,8 @@ var aceTheme=<?php echo (in_array($theme,['black','gray']) ? json_encode('ace/th
 const icon_label = <?php echo json_encode($docker_label_icon); ?>;
 const webui_label = <?php echo json_encode($docker_label_webui); ?>;
 const shell_label = <?php echo json_encode($docker_label_shell); ?>;
+
+$('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', '<?autov("/plugins/compose.manager/styles/comboButton.css");?>') );
 
 if (typeof swal2 === "undefined") {
     $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', '<?autov("/plugins/compose.manager/styles/sweetalert2.css");?>') );
@@ -497,6 +542,47 @@ function generateOverride(myID, myProject=null) {
   });
 }
 
+function generateProfiles(myID, myProject=null) {
+  var project = myProject;
+  if( myID ) {
+    $("#"+myID).tooltipster("close");
+    project = $("#"+myID).attr("data-scriptname");
+  }
+
+  $.post(caURL,{action:'getYml',script:project},function(rawComposefile) {
+    var project_profiles = new Set();
+    if(rawComposefile) {
+      var rawComposefile = jQuery.parseJSON(rawComposefile);
+
+      if( (rawComposefile.result == 'success') ) {
+        var main_doc = jsyaml.load(rawComposefile.content);
+
+        for( var service_key in main_doc.services ) {
+          var service = main_doc.services[service_key];
+          if( service.hasOwnProperty("profiles") ) {
+            // console.log(service.profiles);
+            for( const profile of service.profiles ) {
+              project_profiles.add(profile);
+            }
+          }
+        }
+        
+        // console.log(project_profiles);
+        var rawProfiles = JSON.stringify(Array.from(project_profiles));
+        // console.log(rawProfiles);
+        $.post(caURL,{action:"saveProfiles",script:project,scriptContents:rawProfiles},function(data) {
+          if (!data) {
+            swal2({
+              title: "Failed to update profiles.",
+              icon: "error",
+            })
+          }
+        });
+      }
+    }
+  });
+}
+
 function editComposeFile(myID) {
   var origID = myID;
   $("#"+myID).tooltipster("close");
@@ -568,6 +654,7 @@ function saveEdit() {
       $(".editing").hide();
       if (actionStr == 'saveYml') {
         generateOverride(null,project);
+        generateProfiles(null,project);
       }
     }
   });
@@ -621,33 +708,33 @@ function editStackSettings(myID) {
   });
 }
 
-function ComposeUp(path) {
+function ComposeUp(path, profile="") {
   var height = 800;
   var width = 1200;
   
-  $.post(compURL,{action:'composeUp',path:path},function(data) {
+  $.post(compURL,{action:'composeUp',path:path,profile:profile},function(data) {
     if (data) {
       openBox(data,"Stack "+basename(path)+" Up",height,width,true);
     }
   })
 }
 
-function ComposeDown(path) {
+function ComposeDown(path, profile="") {
   var height = 800;
   var width = 1200;
 
-  $.post(compURL,{action:'composeDown',path:path},function(data) {
+  $.post(compURL,{action:'composeDown',path:path,profile:profile},function(data) {
     if (data) {
       openBox(data,"Stack "+basename(path)+" Down",height,width,true);
     }
   })
 }
 
-function UpdateStack(path) {
+function UpdateStack(path, profile="") {
   var height = 800;
   var width = 1200;
 
-  $.post(compURL,{action:'composeUpPullBuild',path:path},function(data) {
+  $.post(compURL,{action:'composeUpPullBuild',path:path,profile:profile},function(data) {
     if (data) {
       openBox(data,"Update Stack "+basename(path),height,width,true);
     }

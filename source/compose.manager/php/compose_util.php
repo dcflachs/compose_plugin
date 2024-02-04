@@ -32,6 +32,7 @@ function echoComposeCommand($action)
 	$cfg = parse_plugin_cfg($sName);
 	$debug = $cfg['DEBUG_TO_LOG'] == "true";
 	$path = isset($_POST['path']) ? urldecode(($_POST['path'])) : "";
+	$profile = isset($_POST['profile']) ? urldecode(($_POST['profile'])) : "";
 	$unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
 	if ($unRaidVars['mdState'] != "STARTED" ) {
 		echo $plugin_root."/scripts/arrayNotStarted.sh";
@@ -73,6 +74,11 @@ function echoComposeCommand($action)
 		if ( is_file("$path/envpath") ) {
 			$envPath = "-e" . trim(file_get_contents("$path/envpath"));
 			$composeCommand[] = $envPath;
+		}
+
+		if( $profile ) {
+			$profile = "-g $profile";
+			$composeCommand[] = $profile;
 		}
 
 		if( $debug ) {
