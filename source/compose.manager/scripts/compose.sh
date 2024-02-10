@@ -160,6 +160,11 @@ case $command in
     eval docker compose $envFile $files $options logs -f 2>&1
     ;;
 
+  checkUpdates)
+    # Update unRaid's local/remote image versions database so GUI shows correct info about updates
+    docker compose -p "$name" ps --format "{{.Image}}" | php $phpScriptDir/DockerUpdate.php 2>&1
+    ;;
+
   *)
     echo "unknown command"
     echo $command 
