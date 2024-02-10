@@ -126,5 +126,8 @@ switch ($_POST['action']) {
 	case 'composeLogs':
 		echoComposeCommand('logs');
 		break;		
+	case 'composeCheckUpdates':
+		echoComposeCommand('checkUpdates');
+			break;	
 }
 ?>
