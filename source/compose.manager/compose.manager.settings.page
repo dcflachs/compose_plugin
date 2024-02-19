@@ -13,6 +13,8 @@ $ui_unpatch_button_type = (strcmp($cfg['PATCH_UI'],"false") == 0 && isset($compo
 
 $option_patch_ui = version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-RC0', '>=');
 $ui_patch_help_class = $option_patch_ui ? "hidden" : "inline_help";
+
+$projects_exist = intval(shell_exec("ls -l ".$compose_root." | grep ^d | wc -l")) != 0;
 ?>
 <style>
   <?php
@@ -36,10 +38,41 @@ function unpatchWebui() {
     window.location.reload();
   })
 }
+
+function checkProjectFolder() {
+  var projects_folder_not_empty = <?php echo json_encode($projects_exist); ?>;
+  var original_folder = "<?php echo $cfg['PROJECTS_FOLDER'] ?>";
+
+  if(projects_folder_not_empty & ($(this).val() != original_folder))
+  {
+    $("#PROJECTS_FOLDER_WARNING").show();
+  }
+  else
+  {
+    $("#PROJECTS_FOLDER_WARNING").hide();
+  }
+}
+
+$(function() {
+  $('#PROJECTS_FOLDER').on("input", null, null, checkProjectFolder);
+});
+
 </script>
 
 <form markdown="1" name="compose_manager_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="<?=$sName?>/<?=$sName?>.cfg">
+
+_(Compose Project Directory)_:
+: <input type="text" name="PROJECTS_FOLDER" id="PROJECTS_FOLDER" autocomplete="off" spellcheck="false" value="<?=$cfg['PROJECTS_FOLDER']?>" placeholder="_(e.g.)_ /mnt/user/appdata/compose_projects" data-pickcloseonfile="true" data-pickfilter="img" data-pickroot="/mnt" data-pickfolders="true" required pattern="^\/(mnt\/.+\/.+)||(\/boot\/config\/plugins\/compose\.manager\/projects)$">
+  <a class='info nohand' id="PROJECTS_FOLDER_WARNING" onclick="HelpButton();return false;" style="display: none;">
+    <i class='fa fa-warning orb yellow-orb'></i>
+    <span style='left:18px'><strong>Projects exist that will not be moved to the new project folder.</strong></span>
+  </a>
+
+<blockquote class="inline_help" id="PROJECTS_FOLDER_HELP" style="display: none;">
+  Choose the folder in which compose.manager will store your stacks.<br>
+  <strong>WARNING: Changing this path will not automatically move your existing project folders.</strong>
+</blockquote>
 
 _(Compose Command Progress Display)_:
 : <select name="OUTPUTSTYLE">
