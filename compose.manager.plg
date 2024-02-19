@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2024.01.16">
+<!ENTITY version     "2024.02.19">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "9d4e02f8a2cb7d6d3253a5c907a11f53">
+<!ENTITY packageMD5  "b0504eda934e17daa11c6acaf5cb54ec">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,9 @@
 >
 
 <CHANGES>
+###2024.02.19
+- Add option to specify the location in which project directories are stored.
+- Add basic support for handling stacks that define profiles.
 ###2024.01.16
 - Add option to specify the path to an env file. (Thanks to mtongnz)
 ###2023.09.30
