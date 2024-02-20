@@ -219,14 +219,15 @@ switch ($_POST['action']) {
         if( $scriptContents == "[]" ) {
             if ( is_file($fileName) ) {
                 exec("rm ".escapeshellarg($fileName));
-                echo "$fileName deleted";
+                echo json_encode( [ 'result' => 'success', 'message' => "$fileName deleted" ] );
             }
 
+            echo json_encode( [ 'result' => 'success', 'message' => '' ] );
             break;
         }
 
         file_put_contents("$fileName",$scriptContents);
-        echo "$fileName saved";
+        echo json_encode( [ 'result' => 'success', 'message' => "$fileName saved" ] );
         break;
 }
 
