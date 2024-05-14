@@ -205,6 +205,7 @@ $(function() {
                                     <input type='button' onclick='editStack(&quot;"+myID+"&quot;);' value='Edit Stack'> \
                                     <input type='button' onclick='deleteStack(&quot;"+myID+"&quot;);' value='Delete Stack' "+disabled+"> \
                                     <input type='button' onclick='ComposeLogs(&quot;"+myID+"&quot;);' value='Logs' "+notdisabled+"> \
+                                    <input type='button' onclick='ComposeCheckUpdates(&quot;"+myID+"&quot;);' value='Check for Updates'> \
                                     </center>");
 		}
 	});
@@ -751,6 +752,19 @@ function ComposeLogs(myID) {
   $.post(compURL,{action:'composeLogs',path:path},function(data) {
     if (data) {
       openBox(data,"Stack "+basename(path)+" Logs",height,width,true);
+    }
+  })
+}
+
+function ComposeCheckUpdates(myID) {
+  var height = 800;
+  var width = 1200;
+  $("#"+myID).tooltipster("close");
+  var script = $("#"+myID).attr("data-scriptname");
+  var path = compose_root + "/" + script;
+  $.post(compURL,{action:'composeCheckUpdates',path:path},function(data) {
+    if (data) {
+      openBox(data,"Check for Available Updates to Stack "+basename(path),height,width,true);
     }
   })
 }
