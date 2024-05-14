@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2024.02.20">
+<!ENTITY version     "2024.05.10">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "65c4fd3cf9f8cf1b20828b6e9d75573a">
+<!ENTITY packageMD5  "c552b428b30015c81cd56851b62c04e8">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,8 @@
 >
 
 <CHANGES>
+###2024.05.10 
+- Docker Compose v2.27.0
 ###2024.02.20
 - Fix a bug in handling of stacks without profiles.
 ###2024.02.19
