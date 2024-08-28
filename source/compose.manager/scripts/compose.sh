@@ -28,7 +28,7 @@ do
         exit
       fi
 
-      envFile="--env-file $envFile"
+      envFile="--env-file ${envFile@Q}"
       ;;
     -c | --command )
       command="$2"
