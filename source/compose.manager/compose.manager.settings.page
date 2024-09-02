@@ -109,6 +109,25 @@ _(Recreate During Autostart)_:
   network they are attached to no longer exists.
 </blockquote>
 
+
+<?php
+  if (version_compare(parse_ini_file('/etc/unraid-version')['version'],'7.0.0-beta.1', '>')) {
+?>
+
+_(Compose Tab)_:
+: <select name="COMPOSE_TAB">
+  <?=mk_option($cfg['COMPOSE_TAB'], "false", _("No"))?>
+  <?=mk_option($cfg['COMPOSE_TAB'], "true", _("Yes"))?>
+  </select>
+
+<blockquote class="inline_help">
+  This will split Compose Manager section into it's separate tab in the Unraid Header menu.
+</blockquote>
+  
+<?php  
+  }
+?>
+
 _(Patch unRAID WebUI)_:
 : <select name="PATCH_UI">
   <?=mk_option($cfg['PATCH_UI'], "false", _("No"))?>
