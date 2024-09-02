@@ -4,6 +4,6 @@ Title="Docker Compose"
 Tabs="true"
 Tag="fa-cubes"
 Code="f1b3"
-Cond="$var['fsState'] == 'Started' && exec('/etc/rc.d/rc.docker status') && exec(\"grep '^COMPOSE_TAB=' /boot/config/plugins/compose.manager/compose.manager.cfg 2>/dev/null | grep 'true'\")"
+Cond="$var['fsState'] == 'Started' && exec('/etc/rc.d/rc.docker status | grep -v "not"') && exec(\"grep '^COMPOSE_TAB=' /boot/config/plugins/compose.manager/compose.manager.cfg 2>/dev/null | grep 'true'\")"
 ---
 <?php include '/usr/local/emhttp/plugins/compose.manager/php/compose_manager_main.php';?>
