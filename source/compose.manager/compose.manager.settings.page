@@ -109,14 +109,13 @@ _(Recreate During Autostart)_:
   network they are attached to no longer exists.
 </blockquote>
 
-_(Compose Tab)_:
-: <select name="COMPOSE_TAB">
-  <?=mk_option($cfg['COMPOSE_TAB'], "false", _("No"))?>
-  <?=mk_option($cfg['COMPOSE_TAB'], "true", _("Yes"))?>
+_(Show Compose in Header Menu)_: <select name="SHOW_COMPOSE_IN_HEADER_MENU">
+  <?=mk_option($cfg['SHOW_COMPOSE_IN_HEADER_MENU'], "false", _("No"))?>
+  <?=mk_option($cfg['SHOW_COMPOSE_IN_HEADER_MENU'], "true", _("Yes"))?>
   </select>
 
 <blockquote class="inline_help">
-  This will split Compose Manager section into it's separate tab in the Unraid Header menu.
+  This will move the Compose Manager page to a separate tab in the Unraid Header menu.
 </blockquote>
 
 _(Patch unRAID WebUI)_:
