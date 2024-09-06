@@ -8,4 +8,9 @@ Cond="$var['fsState'] == 'Started' && exec('/etc/rc.d/rc.docker status | grep -v
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.switchbutton.css')?>">
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
 <script src="<?autov('/plugins/dynamix.docker.manager/javascript/docker.js')?>"></script>
+<style>
+table tbody td {
+    line-height:normal
+}
+</style>
 <?php include '/usr/local/emhttp/plugins/compose.manager/php/compose_manager_main.php';?>
