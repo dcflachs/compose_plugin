@@ -109,7 +109,8 @@ _(Recreate During Autostart)_:
   network they are attached to no longer exists.
 </blockquote>
 
-_(Show Compose in Header Menu)_: <select name="SHOW_COMPOSE_IN_HEADER_MENU">
+_(Show Compose in Header Menu)_:
+: <select name="SHOW_COMPOSE_IN_HEADER_MENU">
   <?=mk_option($cfg['SHOW_COMPOSE_IN_HEADER_MENU'], "false", _("No"))?>
   <?=mk_option($cfg['SHOW_COMPOSE_IN_HEADER_MENU'], "true", _("Yes"))?>
   </select>
