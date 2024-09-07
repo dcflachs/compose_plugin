@@ -139,8 +139,8 @@ if [[ ! -f "&pluginLOC;/projects/version" ]]; then
     echo "1" > &pluginLOC;/projects/version
 fi
 
-#Add COMPOSE_TAB entry if not exists
-grep -q "COMPOSE_TAB=" &pluginLOC;/&name;.cfg || echo "COMPOSE_TAB=\"false\"" &gt;&gt; &pluginLOC;/&name;.cfg
+#Add SHOW_COMPOSE_IN_HEADER_MENU entry if not exists
+grep -q "SHOW_COMPOSE_IN_HEADER_MENU=" &pluginLOC;/&name;.cfg || echo "SHOW_COMPOSE_IN_HEADER_MENU=\"false\"" &gt;&gt; &pluginLOC;/&name;.cfg
 
 </INLINE>
 </FILE>
