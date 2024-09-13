@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name        "compose.manager">
 <!ENTITY author      "dcflachs">
-<!ENTITY version     "2024.08.29">
+<!ENTITY version     "2024.09.13">
 <!ENTITY launch      "Settings/&name;">
 <!ENTITY packageVER  "&version;">
-<!ENTITY packageMD5  "1be08846b43980408626c4b71cdd2310">
+<!ENTITY packageMD5  "daa56601300f33eea1639b3932967265">
 <!ENTITY packageName "&name;-package-&packageVER;">
 <!ENTITY packagefile "&packageName;.txz">
 <!ENTITY github      "dcflachs/compose_plugin">
@@ -25,6 +25,8 @@
 >
 
 <CHANGES>
+###2024.09.13
+- Added option to show the compose manager interface as a separate page in the header menu. (Thanks to ich777)
 ###2024.08.29 
 - Docker Compose v2.29.2
 - Fix envfile quoting in compose.sh
