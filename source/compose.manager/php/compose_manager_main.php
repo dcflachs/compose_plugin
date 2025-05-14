@@ -637,18 +637,14 @@ function saveEdit() {
   var scriptContents = editor.getValue();
   var actionStr = null
 
-  switch(fileName) {
-    case 'docker-compose.yml':
-      actionStr = 'saveYml'
-      break;
-
-    case '.env':
-      actionStr = 'saveEnv'
-      break;
-
-    default:
-      $(".editing").hide();
-      return;
+  // Check if this is a compose file (any valid extension)
+  if (fileName.match(/^(docker-)?compose\.(yml|yaml)$/)) {
+    actionStr = 'saveYml'
+  } else if (fileName === '.env') {
+    actionStr = 'saveEnv'
+  } else {
+    $(".editing").hide();
+    return;
   }
 
   $.post(caURL,{action:actionStr,script:project,scriptContents:scriptContents},function(data) {
