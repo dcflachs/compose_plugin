@@ -11,7 +11,7 @@ function logger($string) {
 
 function execComposeCommandInTTY($cmd, $debug)
 {
-	global $socket_name;;
+	global $socket_name;
 	$pid = exec("pgrep -a ttyd|awk '/\\/$socket_name\\.sock/{print \$1}'");
 	if ( $debug ) {
 		logger($pid);
@@ -61,14 +61,42 @@ function echoComposeCommand($action)
 			$composeFile = "-d$composeFile";
 		} 
 		else {
-			$composeFile .= "$path/docker-compose.yml";
+			$foundComposeFile = findComposeFile($path);
+			if ($foundComposeFile === null) {
+				$composeFile .= "$path/docker-compose.yml";
+			} else {
+				$composeFile .= $foundComposeFile;
+			}
 			$composeFile = "-f$composeFile";
 		}
 		$composeCommand[] = $composeFile;
 
-		if ( is_file("$path/docker-compose.override.yml") ) {
-			$composeOverride = "-f$path/docker-compose.override.yml";
-			$composeCommand[] = $composeOverride;
+		// Handle override file based on the base compose file name
+		if (isIndirect($path)) {
+			$basePath = getPath($path);
+		} else {
+			$basePath = $path;
+		}
+		
+		$foundComposeFile = findComposeFile($basePath);
+		if ($foundComposeFile !== null) {
+			$baseFileName = getComposeFileBaseName($foundComposeFile);
+			// Get the extension of the original compose file
+			$extension = pathinfo($foundComposeFile, PATHINFO_EXTENSION);
+			$overrideFile = "$basePath/$baseFileName.override.$extension";
+			if (is_file($overrideFile)) {
+				$composeOverride = "-f$overrideFile";
+				$composeCommand[] = $composeOverride;
+			}
+		} else {
+			// Check for both yml and yaml override files
+			if (is_file("$path/docker-compose.override.yml")) {
+				$composeOverride = "-f$path/docker-compose.override.yml";
+				$composeCommand[] = $composeOverride;
+			} else if (is_file("$path/docker-compose.override.yaml")) {
+				$composeOverride = "-f$path/docker-compose.override.yaml";
+				$composeCommand[] = $composeOverride;
+			}
 		}
 
 		if ( is_file("$path/envpath") ) {

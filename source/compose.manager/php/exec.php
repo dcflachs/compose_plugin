@@ -51,10 +51,13 @@ switch ($_POST['action']) {
         #Create stack files
         if ( !empty($indirect) ) {
             file_put_contents("$folder/indirect",$indirect);
-            if ( !is_file("$indirect/docker-compose.yml") ) {
+            $composeFile = findComposeFile($indirect);
+            if ($composeFile === null) {
+                // Create default docker-compose.yml if no compose file exists
                 file_put_contents("$indirect/docker-compose.yml","services:\n");
             }
         } else {
+            // Create default docker-compose.yml for new projects
             file_put_contents("$folder/docker-compose.yml","services:\n");
         }
 
@@ -92,9 +95,22 @@ switch ($_POST['action']) {
     case 'getYml':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $basePath = getPath("$compose_root/$script");
-        $fileName = "docker-compose.yml";
+        $composeFile = findComposeFile($basePath);
+        
+        // If no compose file exists, use the default path
+        if ($composeFile === null) {
+            // Try both yaml and yml extensions
+            if (is_file("$basePath/docker-compose.yaml")) {
+                $fileName = "docker-compose.yaml";
+            } else {
+                $fileName = "docker-compose.yml";
+            }
+            $composeFile = "$basePath/$fileName";
+        } else {
+            $fileName = basename($composeFile);
+        }
 
-        $scriptContents = file_get_contents("$basePath/$fileName");
+        $scriptContents = file_get_contents($composeFile);
         $scriptContents = str_replace("\r","",$scriptContents);
         if ( ! $scriptContents ) {
             $scriptContents = "services:\n";
@@ -120,7 +136,22 @@ switch ($_POST['action']) {
     case 'getOverride':
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $basePath = "$compose_root/$script";
-        $fileName = "docker-compose.override.yml";
+        $composeFile = findComposeFile($basePath);
+        
+        // Determine the override file name based on the base compose file
+        if ($composeFile !== null) {
+            $baseFileName = getComposeFileBaseName($composeFile);
+            // Get the extension of the original compose file
+            $extension = pathinfo($composeFile, PATHINFO_EXTENSION);
+            $fileName = "$baseFileName.override.$extension";
+        } else {
+            // Check for both yml and yaml override files
+            if (is_file("$basePath/docker-compose.override.yaml")) {
+                $fileName = "docker-compose.override.yaml";
+            } else {
+                $fileName = "docker-compose.override.yml";
+            }
+        }
 
         $scriptContents = is_file("$basePath/$fileName") ? file_get_contents("$basePath/$fileName") : "";
         $scriptContents = str_replace("\r","",$scriptContents);
@@ -133,9 +164,22 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = getPath("$compose_root/$script");
-        $fileName = "docker-compose.yml";
+        $composeFile = findComposeFile($basePath);
+        
+        // If no compose file exists, use the default path
+        if ($composeFile === null) {
+            // Try both yaml and yml extensions
+            if (is_file("$basePath/docker-compose.yaml")) {
+                $fileName = "docker-compose.yaml";
+            } else {
+                $fileName = "docker-compose.yml";
+            }
+            $composeFile = "$basePath/$fileName";
+        } else {
+            $fileName = basename($composeFile);
+        }
     
-        file_put_contents("$basePath/$fileName",$scriptContents);
+        file_put_contents($composeFile, $scriptContents);
         echo "$basePath/$fileName saved";
         break;
     case 'saveEnv':
@@ -155,9 +199,24 @@ switch ($_POST['action']) {
         $script = isset($_POST['script']) ? urldecode(($_POST['script'])) : "";
         $scriptContents = isset($_POST['scriptContents']) ? $_POST['scriptContents'] : "";
         $basePath = "$compose_root/$script";
-        $fileName = "docker-compose.override.yml";
+        $composeFile = findComposeFile($basePath);
+        
+        // Determine the override file name based on the base compose file
+        if ($composeFile !== null) {
+            $baseFileName = getComposeFileBaseName($composeFile);
+            // Get the extension of the original compose file
+            $extension = pathinfo($composeFile, PATHINFO_EXTENSION);
+            $fileName = "$baseFileName.override.$extension";
+        } else {
+            // Check for both yml and yaml override files
+            if (is_file("$basePath/docker-compose.override.yaml")) {
+                $fileName = "docker-compose.override.yaml";
+            } else {
+                $fileName = "docker-compose.override.yml";
+            }
+        }
 
-        file_put_contents("$basePath/$fileName",$scriptContents);
+        file_put_contents("$basePath/$fileName", $scriptContents);
         echo "$basePath/$fileName saved";
         break;
     case 'updateAutostart':
