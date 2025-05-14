@@ -71,7 +71,27 @@ function echoComposeCommand($action)
 		}
 		$composeCommand[] = $composeFile;
 
-		// Handle override file based on the base compose file name
+		// First, always include the plugin's override file if it exists
+		global $compose_root;
+		$projectName = basename($path);
+		$pluginOverrideYml = "$compose_root/$projectName/docker-compose.override.yml";
+		$pluginOverrideYaml = "$compose_root/$projectName/docker-compose.override.yaml";
+		
+		if (is_file($pluginOverrideYml)) {
+			$composeOverride = "-f$pluginOverrideYml";
+			$composeCommand[] = $composeOverride;
+			if ( $debug ) {
+				logger("Using plugin override file: $pluginOverrideYml");
+			}
+		} else if (is_file($pluginOverrideYaml)) {
+			$composeOverride = "-f$pluginOverrideYaml";
+			$composeCommand[] = $composeOverride;
+			if ( $debug ) {
+				logger("Using plugin override file: $pluginOverrideYaml");
+			}
+		}
+
+		// Then, also include any project-specific override files
 		if (isIndirect($path)) {
 			$basePath = getPath($path);
 		} else {
@@ -87,15 +107,24 @@ function echoComposeCommand($action)
 			if (is_file($overrideFile)) {
 				$composeOverride = "-f$overrideFile";
 				$composeCommand[] = $composeOverride;
+				if ( $debug ) {
+					logger("Using project override file: $overrideFile");
+				}
 			}
 		} else {
 			// Check for both yml and yaml override files
-			if (is_file("$path/docker-compose.override.yml")) {
-				$composeOverride = "-f$path/docker-compose.override.yml";
+			if (is_file("$basePath/docker-compose.override.yml")) {
+				$composeOverride = "-f$basePath/docker-compose.override.yml";
 				$composeCommand[] = $composeOverride;
-			} else if (is_file("$path/docker-compose.override.yaml")) {
-				$composeOverride = "-f$path/docker-compose.override.yaml";
+				if ( $debug ) {
+					logger("Using project override file: $basePath/docker-compose.override.yml");
+				}
+			} else if (is_file("$basePath/docker-compose.override.yaml")) {
+				$composeOverride = "-f$basePath/docker-compose.override.yaml";
 				$composeCommand[] = $composeOverride;
+				if ( $debug ) {
+					logger("Using project override file: $basePath/docker-compose.override.yaml");
+				}
 			}
 		}
 
