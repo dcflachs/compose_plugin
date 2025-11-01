@@ -1,6 +1,8 @@
 #!/bin/bash
 export HOME=/root
 
+phpScriptDir=/usr/local/emhttp/plugins/compose.manager/php
+
 SHORT=e:,c:,f:,p:,d:,o:,g:
 LONG=env,command:,file:,project_name:,project_dir:,override:,profile:,debug,recreate
 OPTS=$(getopt -a -n compose --options $SHORT --longoptions $LONG -- "$@")
@@ -132,6 +134,9 @@ case $command in
       fi
       eval docker rmi ${images[*]}
     fi
+    
+    # Update unRaid's local/remote image versions database so GUI shows correct info about updates
+    docker compose -p "$name" ps --format "{{.Image}}" | php $phpScriptDir/DockerUpdate.php 2>&1
     ;;
 
   stop)
@@ -153,6 +158,11 @@ case $command in
       logger "docker compose $envFile $files $options logs -f"
     fi
     eval docker compose $envFile $files $options logs -f 2>&1
+    ;;
+
+  checkUpdates)
+    # Update unRaid's local/remote image versions database so GUI shows correct info about updates
+    docker compose -p "$name" ps --format "{{.Image}}" | php $phpScriptDir/DockerUpdate.php 2>&1
     ;;
 
   *)
