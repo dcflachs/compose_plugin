@@ -1,6 +1,15 @@
 #!/bin/bash
 export HOME=/root
 
+# Function to find compose files with both .yml and .yaml extensions
+find_compose_files() {
+  local dir="$1"
+  # First find all .yml files
+  find "$dir" -maxdepth 1 -type f -name '*compose*.yml' -print
+  # Then find all .yaml files
+  find "$dir" -maxdepth 1 -type f -name '*compose*.yaml' -print
+}
+
 SHORT=e:,c:,f:,p:,d:,o:,g:
 LONG=env,command:,file:,project_name:,project_dir:,override:,profile:,debug,recreate
 OPTS=$(getopt -a -n compose --options $SHORT --longoptions $LONG -- "$@")
@@ -44,7 +53,8 @@ do
       ;;
     -d | --project_dir )
       if [ -d "$2" ]; then
-        for file in $( find $2 -maxdepth 1 -type f -name '*compose*.yml' ); do
+        # Use the function to find both .yml and .yaml files
+        for file in $( find_compose_files "$2" ); do
           files="$files -f ${file@Q}"
         done
       fi
@@ -98,15 +108,24 @@ case $command in
     images=()
     images+=( $(docker compose $envFile $files $options -p "$name" images -q) )
 
-    if [ ${#images[@]} -eq 0 ]; then   
+    if [ ${#images[@]} -eq 0 ]; then
       delete="-f"
-      files_arr=( $files ) 
+      files_arr=( $files )
       files_arr=( ${files_arr[@]/$delete} )
       if (( ${#files_arr[@]} )); then
-        services=( $(cat ${files_arr[*]//\'/} | sed -n 's/image:\(.*\)/\1/p') )
-
-        for image in "${services[@]}"; do
-          images+=( $(docker images -q --no-trunc ${image}) )
+        # Process each file individually to handle paths with spaces or special characters
+        for file_path in "${files_arr[@]}"; do
+          # Remove surrounding quotes if present
+          file_path="${file_path//\'}"
+          file_path="${file_path//\"}"
+          
+          if [ -f "$file_path" ]; then
+            # Extract image names from the file
+            file_services=( $(cat "$file_path" | sed -n 's/image:\(.*\)/\1/p') )
+            for image in "${file_services[@]}"; do
+              images+=( $(docker images -q --no-trunc ${image}) )
+            done
+          fi
         done
       fi
 

@@ -8,12 +8,29 @@ COMPOSE_WRAPPER=/usr/local/emhttp/plugins/compose.manager/scripts/compose.sh
 
 for dir in $COMPOSE_ROOT/*; do
     if [ -d "$dir" ]; then
-        if [ -f "$dir/docker-compose.yml" ] || [ -f "$dir/indirect" ]; then
+        # Check if any valid compose file exists
+        if [ -f "$dir/compose.yaml" ] || [ -f "$dir/compose.yml" ] || [ -f "$dir/docker-compose.yaml" ] || [ -f "$dir/docker-compose.yml" ] || [ -f "$dir/indirect" ]; then
             name=${dir}/name
             name=$(< "${name}")
+            # Find the compose file
+            compose_file=""
+            if [ -f "$dir/compose.yaml" ]; then
+                compose_file="$dir/compose.yaml"
+                override_file="$dir/compose.override.yml"
+            elif [ -f "$dir/compose.yml" ]; then
+                compose_file="$dir/compose.yml"
+                override_file="$dir/compose.override.yml"
+            elif [ -f "$dir/docker-compose.yaml" ]; then
+                compose_file="$dir/docker-compose.yaml"
+                override_file="$dir/docker-compose.override.yml"
+            elif [ -f "$dir/docker-compose.yml" ]; then
+                compose_file="$dir/docker-compose.yml"
+                override_file="$dir/docker-compose.override.yml"
+            fi
+            
             override=""
-            if [ -f "$dir/docker-compose.override.yml" ]; then
-                override="$dir/docker-compose.override.yml"
+            if [ -n "$compose_file" ] && [ -f "$override_file" ]; then
+                override="$override_file"
                 override="-f ${override@Q}"
             fi
             envpath=""
@@ -28,8 +45,7 @@ for dir in $COMPOSE_ROOT/*; do
                 indirect=$(< "${indirect}")
                 eval $COMPOSE_WRAPPER -c stop -d ${indirect@Q} -p "${name// /_}" $override $envpath > /dev/null &
             else
-                dir="$dir/docker-compose.yml"
-                eval $COMPOSE_WRAPPER -c stop -f ${dir@Q} -p "${name// /_}" $override $envpath > /dev/null &
+                eval $COMPOSE_WRAPPER -c stop -f ${compose_file@Q} -p "${name// /_}" $override $envpath > /dev/null &
             fi
         fi
     fi

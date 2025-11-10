@@ -33,7 +33,7 @@ if ( ! is_array($composeProjects) ) {
 }
 $o = "";
 foreach ($composeProjects as $project) {
-  if ( ( ! is_file("$compose_root/$project/docker-compose.yml") ) &&
+  if ( ( findComposeFile("$compose_root/$project") === null ) &&
        ( ! is_file("$compose_root/$project/indirect") ) ) {
     continue;
   }
@@ -596,7 +596,9 @@ function editComposeFile(myID) {
       editor.getSession().setOptions({ tabSize: 2, useSoftTabs: true });
 
       $('#editorFileName').data("stackname", project);
-      $('#editorFileName').data("stackfilename", "docker-compose.yml")
+      // Extract the actual filename from the response
+      var filename = response.fileName.split('/').pop();
+      $('#editorFileName').data("stackfilename", filename)
       $('#editorFileName').html(response.fileName)
       $(".editing").show();
 			window.scrollTo(0, 0);
@@ -635,18 +637,14 @@ function saveEdit() {
   var scriptContents = editor.getValue();
   var actionStr = null
 
-  switch(fileName) {
-    case 'docker-compose.yml':
-      actionStr = 'saveYml'
-      break;
-
-    case '.env':
-      actionStr = 'saveEnv'
-      break;
-
-    default:
-      $(".editing").hide();
-      return;
+  // Check if this is a compose file (any valid extension)
+  if (fileName.match(/^(docker-)?compose\.(yml|yaml)$/)) {
+    actionStr = 'saveYml'
+  } else if (fileName === '.env') {
+    actionStr = 'saveEnv'
+  } else {
+    $(".editing").hide();
+    return;
   }
 
   $.post(caURL,{action:actionStr,script:project,scriptContents:scriptContents},function(data) {

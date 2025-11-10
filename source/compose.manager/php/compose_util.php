@@ -11,7 +11,7 @@ function logger($string) {
 
 function execComposeCommandInTTY($cmd, $debug)
 {
-	global $socket_name;;
+	global $socket_name;
 	$pid = exec("pgrep -a ttyd|awk '/\\/$socket_name\\.sock/{print \$1}'");
 	if ( $debug ) {
 		logger($pid);
@@ -61,14 +61,71 @@ function echoComposeCommand($action)
 			$composeFile = "-d$composeFile";
 		} 
 		else {
-			$composeFile .= "$path/docker-compose.yml";
+			$foundComposeFile = findComposeFile($path);
+			if ($foundComposeFile === null) {
+				$composeFile .= "$path/docker-compose.yml";
+			} else {
+				$composeFile .= $foundComposeFile;
+			}
 			$composeFile = "-f$composeFile";
 		}
 		$composeCommand[] = $composeFile;
 
-		if ( is_file("$path/docker-compose.override.yml") ) {
-			$composeOverride = "-f$path/docker-compose.override.yml";
+		// First, always include the plugin's override file if it exists
+		global $compose_root;
+		$projectName = basename($path);
+		$pluginOverrideYml = "$compose_root/$projectName/docker-compose.override.yml";
+		$pluginOverrideYaml = "$compose_root/$projectName/docker-compose.override.yaml";
+		
+		if (is_file($pluginOverrideYml)) {
+			$composeOverride = "-f$pluginOverrideYml";
 			$composeCommand[] = $composeOverride;
+			if ( $debug ) {
+				logger("Using plugin override file: $pluginOverrideYml");
+			}
+		} else if (is_file($pluginOverrideYaml)) {
+			$composeOverride = "-f$pluginOverrideYaml";
+			$composeCommand[] = $composeOverride;
+			if ( $debug ) {
+				logger("Using plugin override file: $pluginOverrideYaml");
+			}
+		}
+
+		// Then, also include any project-specific override files
+		if (isIndirect($path)) {
+			$basePath = getPath($path);
+		} else {
+			$basePath = $path;
+		}
+		
+		$foundComposeFile = findComposeFile($basePath);
+		if ($foundComposeFile !== null) {
+			$baseFileName = getComposeFileBaseName($foundComposeFile);
+			// Get the extension of the original compose file
+			$extension = pathinfo($foundComposeFile, PATHINFO_EXTENSION);
+			$overrideFile = "$basePath/$baseFileName.override.$extension";
+			if (is_file($overrideFile)) {
+				$composeOverride = "-f$overrideFile";
+				$composeCommand[] = $composeOverride;
+				if ( $debug ) {
+					logger("Using project override file: $overrideFile");
+				}
+			}
+		} else {
+			// Check for both yml and yaml override files
+			if (is_file("$basePath/docker-compose.override.yml")) {
+				$composeOverride = "-f$basePath/docker-compose.override.yml";
+				$composeCommand[] = $composeOverride;
+				if ( $debug ) {
+					logger("Using project override file: $basePath/docker-compose.override.yml");
+				}
+			} else if (is_file("$basePath/docker-compose.override.yaml")) {
+				$composeOverride = "-f$basePath/docker-compose.override.yaml";
+				$composeCommand[] = $composeOverride;
+				if ( $debug ) {
+					logger("Using project override file: $basePath/docker-compose.override.yaml");
+				}
+			}
 		}
 
 		if ( is_file("$path/envpath") ) {
